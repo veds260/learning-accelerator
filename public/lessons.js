@@ -141,10 +141,12 @@ function renderLessonPath() {
       cardClass += ' current';
     }
     
-    const clickHandler = isLocked ? '' : `onclick="window.location.href='lesson-detail.html?id=${lesson.id}')"`;
+    // Allow clicking on current OR completed lessons (not locked)
+    const clickHandler = isLocked ? '' : `onclick="window.location.href='lesson-detail.html?id=${lesson.id}'"`;
+    const cursorStyle = isLocked ? '' : 'style="cursor: pointer;"';
     
     return `
-      <div class="${cardClass}" ${clickHandler}>
+      <div class="${cardClass}" ${clickHandler} ${cursorStyle}>
         <span class="lesson-card-emoji">${lesson.emoji}</span>
         <div class="lesson-card-content">
           <div class="lesson-card-level">Level ${lesson.level}</div>
@@ -177,30 +179,9 @@ function renderAchievements() {
   }).join('');
 }
 
-// View individual lesson
+// View individual lesson - just redirect to detail page
 function viewLesson(lessonId) {
-  const lesson = lessonsData.find(l => l.id === lessonId);
-  if (!lesson) return;
-  
-  // Check if locked
-  const lessonIndex = lessonsData.findIndex(l => l.id === lessonId);
-  if (lessonIndex > 0) {
-    const previousLesson = lessonsData[lessonIndex - 1];
-    if (!userProgress.completedLessons.includes(previousLesson.id)) {
-      alert(`Complete "${previousLesson.title}" first to unlock this lesson!`);
-      return;
-    }
-  }
-  
-  // Hide lessons list, show lesson detail
-  document.getElementById('lessons-list').style.display = 'none';
-  document.getElementById('lesson-detail').style.display = 'block';
-  
-  // Populate lesson content
-  renderLessonDetail(lesson);
-  
-  // Scroll to top
-  window.scrollTo(0, 0);
+  window.location.href = `lesson-detail.html?id=${lessonId}`;
 }
 
 // Render lesson detail
