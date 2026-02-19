@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"="width=device-width, initial-scale=1.0">
+  <title>Code Playground - Learning Accelerator</title>
+  <link rel="stylesheet" href="code-playground.css">
+  
+  <!-- Monaco Editor -->
+  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
+  
+  <!-- Pyodide -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+</head>
+<body>
+  <div id="playground-container" class="hidden">
+    <div class="playground-header">
+      <h3 id="exercise-title">Code Exercise</h3>
+      <button id="close-playground" class="btn-secondary">✕ Close</button>
+    </div>
+    
+    <div class="playground-content">
+      <div class="instructions-panel">
+        <h4>📝 Instructions</h4>
+        <p id="exercise-instructions"></p>
+        
+        <div id="hints-section" class="hidden">
+          <button id="show-hint-btn" class="btn-hint">💡 Show Hint</button>
+          <div id="hint-display" class="hidden"></div>
+        </div>
+        
+        <div id="solution-section" class="hidden">
+          <button id="show-solution-btn" class="btn-solution">🔓 Show Solution</button>
+        </div>
+      </div>
+      
+      <div class="editor-panel">
+        <div class="editor-header">
+          <span class="editor-label">🐍 Python</span>
+          <div class="editor-controls">
+            <button id="reset-code-btn" class="btn-secondary btn-sm">↺ Reset</button>
+            <button id="run-code-btn" class="btn-primary btn-sm">▶ Run Code</button>
+          </div>
+        </div>
+        
+        <div id="code-editor"></div>
+        
+        <div class="console-panel">
+          <div class="console-header">
+            <span>Console Output</span>
+            <button id="clear-console-btn" class="btn-clear">Clear</button>
+          </div>
+          <div id="console-output"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="validation-message" class="hidden"></div>
+  </div>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+  <script src="code-playground.js"></script>
+</body>
+</html>

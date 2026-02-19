@@ -1,0 +1,328 @@
+[
+  {
+    "id": "manning-setup",
+    "title": "Set Up Your LLM Development Environment",
+    "description": "Follow Sebastian Raschka's guide to set up Python environment for building LLMs from scratch",
+    "timeEstimate": "1-2 hours",
+    "xp": 25,
+    "tier": "foundation",
+    "videos": [
+      1
+    ],
+    "chapter": "Setup",
+    "tasks": [
+      "Install Python 3.8+ and create virtual environment",
+      "Install PyTorch, NumPy, and Jupyter",
+      "Clone the book's GitHub repository",
+      "Run test notebook to verify setup"
+    ],
+    "winCondition": "Successfully run a simple PyTorch tensor operation in Jupyter notebook"
+  },
+  {
+    "id": "manning-tokenization",
+    "title": "Build a Text Tokenizer",
+    "description": "Implement the tokenization process that breaks text into processable chunks for LLMs",
+    "timeEstimate": "2-3 hours",
+    "xp": 50,
+    "tier": "foundation",
+    "videos": [
+      2,
+      3
+    ],
+    "chapter": "2.2-2.3",
+    "tasks": [
+      "Implement simple whitespace tokenizer",
+      "Build vocabulary from sample text",
+      "Convert tokens to integer IDs",
+      "Test on a paragraph of text"
+    ],
+    "winCondition": "Tokenizer converts text to IDs and back to text without loss"
+  },
+  {
+    "id": "manning-special-tokens",
+    "title": "Add Special Tokens to Your Tokenizer",
+    "description": "Enhance your tokenizer with special tokens like BOS, EOS, UNK for better LLM compatibility",
+    "timeEstimate": "1-2 hours",
+    "xp": 35,
+    "tier": "foundation",
+    "videos": [
+      4
+    ],
+    "chapter": "2.4",
+    "tasks": [
+      "Add <BOS> (beginning of sequence) token",
+      "Add <EOS> (end of sequence) token",
+      "Add <UNK> (unknown) token for out-of-vocabulary words",
+      "Update encoding/decoding functions to handle special tokens"
+    ],
+    "winCondition": "Tokenizer correctly adds BOS/EOS to sequences and handles unknown words"
+  },
+  {
+    "id": "manning-bpe",
+    "title": "Implement Byte Pair Encoding",
+    "description": "Build the BPE algorithm used by GPT models for subword tokenization",
+    "timeEstimate": "3-4 hours",
+    "xp": 75,
+    "tier": "intermediate",
+    "videos": [
+      5
+    ],
+    "chapter": "2.5",
+    "tasks": [
+      "Implement BPE merge algorithm",
+      "Train BPE on sample corpus (10,000+ words)",
+      "Create subword vocabulary",
+      "Compare compression vs simple tokenizer"
+    ],
+    "winCondition": "BPE tokenizer achieves better vocabulary efficiency than word-level tokenizer"
+  },
+  {
+    "id": "manning-data-sampling",
+    "title": "Create Training Data with Sliding Window",
+    "description": "Build a data loader that generates input-target pairs for LLM training",
+    "timeEstimate": "2-3 hours",
+    "xp": 50,
+    "tier": "intermediate",
+    "videos": [
+      6
+    ],
+    "chapter": "2.6",
+    "tasks": [
+      "Implement sliding window data sampler",
+      "Set context length (e.g., 256 tokens)",
+      "Generate input-output pairs",
+      "Create PyTorch DataLoader"
+    ],
+    "winCondition": "Data loader yields batches of (input, target) sequences for training"
+  },
+  {
+    "id": "manning-embeddings",
+    "title": "Build Token Embedding Layer",
+    "description": "Create the embedding layer that converts token IDs to dense vector representations",
+    "timeEstimate": "2-3 hours",
+    "xp": 60,
+    "tier": "intermediate",
+    "videos": [
+      7
+    ],
+    "chapter": "2.7",
+    "tasks": [
+      "Initialize embedding matrix (vocab_size x embed_dim)",
+      "Implement forward pass (token IDs → vectors)",
+      "Test with sample tokens",
+      "Visualize embedding space with t-SNE"
+    ],
+    "winCondition": "Embedding layer converts token IDs to 256-dimensional vectors"
+  },
+  {
+    "id": "manning-positional-encoding",
+    "title": "Add Positional Encodings",
+    "description": "Implement position embeddings to help the model understand word order",
+    "timeEstimate": "2-3 hours",
+    "xp": 60,
+    "tier": "intermediate",
+    "videos": [
+      8
+    ],
+    "chapter": "2.8",
+    "tasks": [
+      "Create position embedding matrix",
+      "Add position embeddings to token embeddings",
+      "Verify shapes match (batch x seq_len x embed_dim)",
+      "Test with sequences of different lengths"
+    ],
+    "winCondition": "Combined embeddings contain both token and position information"
+  },
+  {
+    "id": "manning-self-attention",
+    "title": "Build Self-Attention Mechanism",
+    "description": "Implement the core self-attention mechanism that powers transformers",
+    "timeEstimate": "3-4 hours",
+    "xp": 100,
+    "tier": "intermediate",
+    "videos": [
+      9,
+      10
+    ],
+    "chapter": "3.3",
+    "tasks": [
+      "Implement query, key, value projections",
+      "Compute attention scores (Q @ K.T)",
+      "Apply softmax to get attention weights",
+      "Compute weighted sum of values"
+    ],
+    "winCondition": "Self-attention layer produces context-aware embeddings for each token"
+  },
+  {
+    "id": "manning-attention-class",
+    "title": "Create Self-Attention Class",
+    "description": "Package self-attention into a reusable PyTorch module",
+    "timeEstimate": "2-3 hours",
+    "xp": 70,
+    "tier": "intermediate",
+    "videos": [
+      11,
+      12
+    ],
+    "chapter": "3.4",
+    "tasks": [
+      "Create SelfAttention class inheriting nn.Module",
+      "Initialize Q, K, V weight matrices",
+      "Implement forward() method",
+      "Add proper docstrings and type hints"
+    ],
+    "winCondition": "SelfAttention class works as drop-in layer in neural network"
+  },
+  {
+    "id": "manning-causal-mask",
+    "title": "Implement Causal Attention Masking",
+    "description": "Add causal masking so model can only attend to past tokens (GPT-style)",
+    "timeEstimate": "2-3 hours",
+    "xp": 75,
+    "tier": "advanced",
+    "videos": [
+      13
+    ],
+    "chapter": "3.5.1",
+    "tasks": [
+      "Create lower triangular mask matrix",
+      "Apply mask before softmax (set future positions to -inf)",
+      "Verify token i cannot see tokens j > i",
+      "Test with sample sequences"
+    ],
+    "winCondition": "Attention weights are zero for all future positions"
+  },
+  {
+    "id": "manning-dropout",
+    "title": "Add Dropout to Attention",
+    "description": "Implement attention dropout for regularization during training",
+    "timeEstimate": "1-2 hours",
+    "xp": 40,
+    "tier": "advanced",
+    "videos": [
+      14
+    ],
+    "chapter": "3.5.2",
+    "tasks": [
+      "Add dropout layer after attention weights",
+      "Set dropout rate (e.g., 0.1)",
+      "Ensure dropout only active during training",
+      "Test train vs eval modes"
+    ],
+    "winCondition": "Dropout randomly zeros attention weights during training only"
+  },
+  {
+    "id": "manning-causal-attention-class",
+    "title": "Build Causal Self-Attention Class",
+    "description": "Combine causal masking and dropout into production-ready attention module",
+    "timeEstimate": "2-3 hours",
+    "xp": 80,
+    "tier": "advanced",
+    "videos": [
+      15
+    ],
+    "chapter": "3.5.3",
+    "tasks": [
+      "Create CausalSelfAttention class",
+      "Integrate causal mask and dropout",
+      "Add flexible hyperparameters (dropout_rate, embed_dim)",
+      "Write unit tests"
+    ],
+    "winCondition": "CausalSelfAttention class ready for GPT-style language model"
+  },
+  {
+    "id": "manning-multi-layer",
+    "title": "Stack Multiple Attention Layers",
+    "description": "Create a deep network by stacking multiple attention layers",
+    "timeEstimate": "2-3 hours",
+    "xp": 70,
+    "tier": "advanced",
+    "videos": [
+      16
+    ],
+    "chapter": "3.6.1",
+    "tasks": [
+      "Create nn.Sequential or custom module with multiple layers",
+      "Stack 6-12 attention layers",
+      "Add residual connections between layers",
+      "Monitor gradient flow through deep network"
+    ],
+    "winCondition": "6+ layer network trains without vanishing gradients"
+  },
+  {
+    "id": "manning-multi-head",
+    "title": "Implement Multi-Head Attention",
+    "description": "Build multi-head attention to capture different types of relationships",
+    "timeEstimate": "3-4 hours",
+    "xp": 100,
+    "tier": "advanced",
+    "videos": [
+      17
+    ],
+    "chapter": "3.6.2",
+    "tasks": [
+      "Split embeddings into multiple heads",
+      "Run parallel attention computations",
+      "Concatenate head outputs",
+      "Project back to embed_dim"
+    ],
+    "winCondition": "Multi-head attention with 8-12 heads produces better representations than single-head"
+  },
+  {
+    "id": "manning-llm-architecture",
+    "title": "Code Complete GPT Architecture",
+    "description": "Assemble all components into a complete GPT-style language model",
+    "timeEstimate": "4-5 hours",
+    "xp": 150,
+    "tier": "advanced",
+    "videos": [
+      18
+    ],
+    "chapter": "4.1",
+    "tasks": [
+      "Combine embeddings, attention, and feedforward layers",
+      "Add residual connections and layer norms",
+      "Implement final output projection to vocabulary",
+      "Verify architecture matches GPT-2 spec"
+    ],
+    "winCondition": "Complete GPT model accepts text and outputs next-token predictions"
+  },
+  {
+    "id": "manning-layer-norm",
+    "title": "Add Layer Normalization",
+    "description": "Implement layer normalization for training stability",
+    "timeEstimate": "2-3 hours",
+    "xp": 60,
+    "tier": "advanced",
+    "videos": [
+      19
+    ],
+    "chapter": "4.2",
+    "tasks": [
+      "Implement LayerNorm calculation (normalize across embedding dim)",
+      "Add learnable scale and bias parameters",
+      "Place LayerNorm before/after attention and FFN",
+      "Compare training with vs without LayerNorm"
+    ],
+    "winCondition": "LayerNorm stabilizes training (lower loss variance)"
+  },
+  {
+    "id": "manning-gelu-ffn",
+    "title": "Build Feed-Forward Network with GELU",
+    "description": "Implement the position-wise feed-forward network used in transformers",
+    "timeEstimate": "2-3 hours",
+    "xp": 70,
+    "tier": "advanced",
+    "videos": [
+      20
+    ],
+    "chapter": "4.3",
+    "tasks": [
+      "Create 2-layer FFN (embed_dim → 4*embed_dim → embed_dim)",
+      "Use GELU activation (not ReLU)",
+      "Add dropout for regularization",
+      "Integrate into transformer block"
+    ],
+    "winCondition": "FFN layers improve model capacity vs attention-only model"
+  }
+]

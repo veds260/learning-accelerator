@@ -1,0 +1,175 @@
+{
+  "achievements": [
+    {
+      "id": "first-quiz",
+      "title": "Quiz Rookie",
+      "description": "Complete your first quiz",
+      "emoji": "🎯",
+      "xp": 20,
+      "category": "quiz",
+      "condition": { "type": "quizCount", "value": 1 }
+    },
+    {
+      "id": "perfect-score",
+      "title": "Perfect Score",
+      "description": "Get 100% on any quiz",
+      "emoji": "💯",
+      "xp": 50,
+      "category": "quiz",
+      "condition": { "type": "perfectQuiz", "value": 1 }
+    },
+    {
+      "id": "quiz-master",
+      "title": "Quiz Master",
+      "description": "Complete all final quizzes with 90%+",
+      "emoji": "🏆",
+      "xp": 200,
+      "category": "quiz",
+      "condition": { "type": "allQuizzes90Plus", "value": 5 }
+    },
+    {
+      "id": "speed-demon",
+      "title": "Speed Demon",
+      "description": "Answer 5 quiz questions in under 10 seconds each",
+      "emoji": "⚡",
+      "xp": 30,
+      "category": "quiz",
+      "condition": { "type": "fastAnswers", "value": 5 }
+    },
+    {
+      "id": "combo-king",
+      "title": "Combo King",
+      "description": "Get 5 correct answers in a row",
+      "emoji": "🔥",
+      "xp": 40,
+      "category": "quiz",
+      "condition": { "type": "streak", "value": 5 }
+    },
+    {
+      "id": "first-lesson",
+      "title": "Learning Begins",
+      "description": "Complete your first lesson",
+      "emoji": "📚",
+      "xp": 10,
+      "category": "lesson",
+      "condition": { "type": "lessonCount", "value": 1 }
+    },
+    {
+      "id": "halfway-there",
+      "title": "Halfway There",
+      "description": "Complete 3 out of 5 lessons",
+      "emoji": "⭐",
+      "xp": 75,
+      "category": "lesson",
+      "condition": { "type": "lessonCount", "value": 3 }
+    },
+    {
+      "id": "foundation-complete",
+      "title": "Foundation Complete",
+      "description": "Complete all 5 foundation lessons",
+      "emoji": "🎓",
+      "xp": 150,
+      "category": "lesson",
+      "condition": { "type": "lessonCount", "value": 5 }
+    },
+    {
+      "id": "consistent",
+      "title": "Consistent Learner",
+      "description": "Maintain a 7-day learning streak",
+      "emoji": "🔥",
+      "xp": 100,
+      "category": "streak",
+      "condition": { "type": "dayStreak", "value": 7 }
+    },
+    {
+      "id": "night-owl",
+      "title": "Night Owl",
+      "description": "Complete a lesson after 10 PM",
+      "emoji": "🦉",
+      "xp": 25,
+      "category": "time",
+      "condition": { "type": "timeOfDay", "value": "night" }
+    },
+    {
+      "id": "early-bird",
+      "title": "Early Bird",
+      "description": "Complete a lesson before 8 AM",
+      "emoji": "🌅",
+      "xp": 25,
+      "category": "time",
+      "condition": { "type": "timeOfDay", "value": "morning" }
+    },
+    {
+      "id": "weekend-warrior",
+      "title": "Weekend Warrior",
+      "description": "Study on both Saturday and Sunday",
+      "emoji": "💪",
+      "xp": 50,
+      "category": "time",
+      "condition": { "type": "weekendDays", "value": 2 }
+    },
+    {
+      "id": "quick-learner",
+      "title": "Quick Learner",
+      "description": "Complete a lesson in under 15 minutes",
+      "emoji": "⏱️",
+      "xp": 30,
+      "category": "speed",
+      "condition": { "type": "lessonTime", "value": 900 }
+    },
+    {
+      "id": "deep-diver",
+      "title": "Deep Diver",
+      "description": "Spend over 45 minutes on a single lesson",
+      "emoji": "🤿",
+      "xp": 40,
+      "category": "engagement",
+      "condition": { "type": "lessonTime", "value": 2700, "min": true }
+    },
+    {
+      "id": "note-taker",
+      "title": "Note Taker",
+      "description": "Add your first personal note to a lesson",
+      "emoji": "📝",
+      "xp": 15,
+      "category": "engagement",
+      "condition": { "type": "noteCount", "value": 1 }
+    },
+    {
+      "id": "bookworm",
+      "title": "Bookworm",
+      "description": "Bookmark 5 sections for later review",
+      "emoji": "🔖",
+      "xp": 20,
+      "category": "engagement",
+      "condition": { "type": "bookmarkCount", "value": 5 }
+    },
+    {
+      "id": "practice-makes-perfect",
+      "title": "Practice Makes Perfect",
+      "description": "Retake a quiz in practice mode",
+      "emoji": "🎯",
+      "xp": 15,
+      "category": "quiz",
+      "condition": { "type": "practiceMode", "value": 1 }
+    },
+    {
+      "id": "xp-hunter",
+      "title": "XP Hunter",
+      "description": "Earn 500 total XP",
+      "emoji": "💎",
+      "xp": 50,
+      "category": "xp",
+      "condition": { "type": "totalXP", "value": 500 }
+    },
+    {
+      "id": "xp-legend",
+      "title": "XP Legend",
+      "description": "Earn 1000 total XP",
+      "emoji": "👑",
+      "xp": 100,
+      "category": "xp",
+      "condition": { "type": "totalXP", "value": 1000 }
+    }
+  ]
+}

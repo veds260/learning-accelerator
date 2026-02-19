@@ -606,6 +606,38 @@ app.post('/api/lessons/:id/complete', (req, res) => {
   }
 });
 
+// Quiz endpoints
+const QUIZ_FILE = path.join(__dirname, 'data-source', 'quiz-questions.json');
+const CODE_EXERCISES_FILE = path.join(__dirname, 'data-source', 'code-exercises.json');
+
+app.get('/api/quiz/:lessonId', (req, res) => {
+  try {
+    if (!fs.existsSync(QUIZ_FILE)) {
+      return res.json({ inLessonQuizzes: [], finalQuiz: null });
+    }
+    const quizzes = JSON.parse(fs.readFileSync(QUIZ_FILE, 'utf8'));
+    const lessonQuiz = quizzes.find(q => q.lessonId === req.params.lessonId);
+    res.json(lessonQuiz || { inLessonQuizzes: [], finalQuiz: null });
+  } catch (error) {
+    console.error('Error loading quiz:', error);
+    res.status(500).json({ error: 'Failed to load quiz' });
+  }
+});
+
+app.get('/api/code-exercises/:lessonId', (req, res) => {
+  try {
+    if (!fs.existsSync(CODE_EXERCISES_FILE)) {
+      return res.json({ exercises: [] });
+    }
+    const exercises = JSON.parse(fs.readFileSync(CODE_EXERCISES_FILE, 'utf8'));
+    const lessonExercises = exercises.find(e => e.lessonId === req.params.lessonId);
+    res.json(lessonExercises || { exercises: [] });
+  } catch (error) {
+    console.error('Error loading exercises:', error);
+    res.status(500).json({ error: 'Failed to load exercises' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Learning Accelerator running on http://localhost:${PORT}`);
   console.log(`📚 Lessons available at http://localhost:${PORT}/lessons.html`);
