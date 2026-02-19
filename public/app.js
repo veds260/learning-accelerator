@@ -257,8 +257,15 @@ async function markComplete(id) {
 // Quiz
 async function loadQuiz() {
   try {
+    console.log('Loading quiz cards...');
     const response = await fetch(`${API_BASE}/api/quiz/due`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
     quizCards = await response.json();
+    console.log(`Loaded ${quizCards.length} quiz cards`);
 
     if (quizCards.length === 0) {
       showNoCards();
@@ -269,6 +276,17 @@ async function loadQuiz() {
 
   } catch (error) {
     console.error('Failed to load quiz:', error);
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = `
+      <div class="no-cards">
+        <h3>⚠️ Error Loading Quiz</h3>
+        <p>${error.message}</p>
+        <button class="btn" onclick="loadQuiz()">Retry</button>
+        <button class="btn" onclick="loadDashboard(); switchView('dashboard');">
+          Back to Dashboard
+        </button>
+      </div>
+    `;
   }
 }
 
