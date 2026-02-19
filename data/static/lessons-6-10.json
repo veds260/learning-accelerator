@@ -78,5 +78,195 @@
       "xp": 150
     },
     "easterEgg": "Researchers found that some attention heads in GPT learn to detect specific patterns without being told: one head specializes in detecting Python function definitions, another in finding matching parentheses, another in tracking quote pairs. They discovered these patterns by accident after training."
+  },
+  {
+    "id": "positional-encoding",
+    "level": 8,
+    "title": "The Order Detective",
+    "subtitle": "Teaching AI That Word Order Matters",
+    "emoji": "🔢",
+    "story": "Your AI has a problem: it can't tell the difference between 'dog bites man' and 'man bites dog.' Why? Self-attention looks at ALL words simultaneously—there's no concept of 'first' or 'last.' It's like reading a sentence where all words are floating in space. You need to tag each word with its position. But here's the trick: you can't just use integers (1, 2, 3...) because the model can't learn from that. You need a continuous, learnable pattern. Enter: sinusoidal positional encoding—the GPS coordinates for language.",
+    "hook": "Attention is position-blind. Positional encoding gives it vision.",
+    "concept": "Positional encoding adds position information to embeddings without using trainable parameters. It uses sine and cosine functions at different frequencies to create unique, continuous patterns for each position:\n\nPE(pos, 2i) = sin(pos / 10000^(2i/d_model))\nPE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))\n\nWhy sine/cosine? (1) Smooth, continuous values (2) Periodic patterns the model can learn (3) Relative positions are consistent (pos+k has a linear relationship to pos) (4) Works for any sequence length. Each position gets a unique 'fingerprint' that's added to the token embedding.",
+    "analogy": "Imagine organizing a massive library with no shelf numbers. You need a system where:\n\n**Bad idea:** Label shelves 1, 2, 3... (integers don't scale—is shelf 1000 'similar' to 999?)\n\n**Better idea:** Use a color gradient! Shelf 1 = deep red, shelf 500 = yellow, shelf 1000 = deep blue. But in 768 dimensions instead of 3 (RGB). Each shelf gets a unique color that smoothly transitions. Nearby shelves have similar colors (nearby positions have similar encodings). The sine/cosine waves create this smooth gradient in high-dimensional space.",
+    "visual": "POSITIONAL ENCODING VISUALIZATION:\n\nSequence: [The, cat, sat, on, the, mat]\n\nStep 1: Token embeddings (meaning)\n  [The] → [0.2, -0.5, 0.8, ...] (768-dim)\n  [cat] → [0.9, 0.1, -0.3, ...]\n  [sat] → [-0.4, 0.7, 0.2, ...]\n\nStep 2: Positional encodings (position)\n  pos=0 → [0.00, 1.00, 0.00, 1.00, ...] (sin/cos pattern)\n  pos=1 → [0.84, 0.54, 0.01, 1.00, ...]\n  pos=2 → [0.91, -0.42, 0.02, 1.00, ...]\n\nStep 3: Combine (addition)\n  [The at pos 0] = [0.20, 0.50, 0.80, ...]\n  [cat at pos 1] = [1.74, 0.64, -0.29, ...]\n  [sat at pos 2] = [0.51, 0.28, 0.22, ...]\n\nSINE/COSINE WAVE PATTERN:\n\nDimension 0 (high freq):  ~~~∿~~~∿~~~∿~~~\nDimension 2 (mid freq):   ∿∿∿~~~~∿∿∿~~~~\nDimension 4 (low freq):   ∿∿∿∿∿∿~~~~∿∿∿∿\n\nEach dimension oscillates at a different frequency,\ncreating a unique pattern for each position!",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Building Positional Encoding from Scratch",
+        "description": "Let's implement the sinusoidal position encoding formula:",
+        "code": "import torch\nimport math\nimport matplotlib.pyplot as plt\n\ndef positional_encoding(max_len, d_model):\n    # Create position indices [0, 1, 2, ..., max_len-1]\n    position = torch.arange(max_len).unsqueeze(1)  # Shape: (max_len, 1)\n    \n    # Create dimension indices [0, 2, 4, ..., d_model-2]\n    div_term = torch.exp(torch.arange(0, d_model, 2) * \n                        -(math.log(10000.0) / d_model))\n    \n    # Initialize encoding matrix\n    pe = torch.zeros(max_len, d_model)\n    \n    # Apply sine to even dimensions\n    pe[:, 0::2] = torch.sin(position * div_term)\n    \n    # Apply cosine to odd dimensions\n    pe[:, 1::2] = torch.cos(position * div_term)\n    \n    return pe\n\n# Generate encodings\nmax_len = 100\nd_model = 128\npe = positional_encoding(max_len, d_model)\n\nprint(f\"Positional encoding shape: {pe.shape}\")\nprint(f\"\\nPosition 0 encoding (first 8 dims):\")\nprint(pe[0, :8])\nprint(f\"\\nPosition 10 encoding (first 8 dims):\")\nprint(pe[10, :8])\n\n# Visualize the pattern\nprint(f\"\\nEach position has a unique 'fingerprint'!\")",
+        "explanation": "Notice how position 0 and position 10 have completely different patterns. The sine/cosine functions at different frequencies create unique encodings that the model can learn to interpret as position."
+      },
+      {
+        "type": "code",
+        "title": "Visualizing Position Patterns",
+        "description": "See how different dimensions oscillate at different frequencies:",
+        "code": "import torch\nimport math\n\n# Generate encodings for visualization\nmax_len = 50\nd_model = 128\npe = positional_encoding(max_len, d_model)\n\n# Look at specific dimensions\npositions = range(max_len)\ndim_0 = pe[:, 0].numpy()   # Highest frequency\ndim_10 = pe[:, 10].numpy()  # Medium frequency\ndim_50 = pe[:, 50].numpy()  # Low frequency\n\nprint(\"Dimension 0 (high freq):\")\nprint([f\"{x:.2f}\" for x in dim_0[:10]])\nprint(\"\\nDimension 10 (medium freq):\")\nprint([f\"{x:.2f}\" for x in dim_10[:10]])\nprint(\"\\nDimension 50 (low freq):\")\nprint([f\"{x:.2f}\" for x in dim_50[:10]])\n\nprint(\"\\nPattern: Higher dimensions oscillate more slowly,\")\nprint(\"capturing long-range position relationships!\")",
+        "explanation": "Different dimensions capture position at different scales. Low-frequency dimensions help the model understand that position 5 and 6 are close, while high-frequency dimensions give precise position info."
+      },
+      {
+        "type": "code",
+        "title": "Adding Positional Encoding to Embeddings",
+        "description": "Combine token meaning with position information:",
+        "code": "import torch\nimport torch.nn as nn\nimport math\n\nclass PositionalEncoding(nn.Module):\n    def __init__(self, d_model, max_len=5000, dropout=0.1):\n        super().__init__()\n        self.dropout = nn.Dropout(p=dropout)\n        \n        # Create constant positional encoding matrix\n        pe = torch.zeros(max_len, d_model)\n        position = torch.arange(0, max_len).unsqueeze(1)\n        div_term = torch.exp(torch.arange(0, d_model, 2) * \n                            -(math.log(10000.0) / d_model))\n        \n        pe[:, 0::2] = torch.sin(position * div_term)\n        pe[:, 1::2] = torch.cos(position * div_term)\n        \n        # Register as buffer (not a parameter, but part of state)\n        self.register_buffer('pe', pe)\n    \n    def forward(self, x):\n        # x shape: (batch_size, seq_len, d_model)\n        seq_len = x.size(1)\n        \n        # Add positional encoding to input\n        x = x + self.pe[:seq_len, :]\n        return self.dropout(x)\n\n# Example usage\nd_model = 512\nvocab_size = 10000\n\n# Token embedding layer\ntoken_embedding = nn.Embedding(vocab_size, d_model)\n\n# Positional encoding layer\npos_encoding = PositionalEncoding(d_model)\n\n# Process a batch\ntokens = torch.tensor([[42, 100, 5, 88], [7, 99, 12, 456]])  # 2 sequences\nembeddings = token_embedding(tokens)  # Get token embeddings\nembeddings = pos_encoding(embeddings)  # Add positional info\n\nprint(f\"Input tokens shape: {tokens.shape}\")  # (2, 4)\nprint(f\"Output embeddings shape: {embeddings.shape}\")  # (2, 4, 512)\nprint(f\"\\nNow each token knows both WHAT it means and WHERE it is!\")",
+        "explanation": "This module is used in every transformer model. The positional encoding is pre-computed (not learned) and simply added to the token embeddings. The dropout helps prevent overfitting to specific positions."
+      },
+      {
+        "type": "code",
+        "title": "Testing Position Awareness",
+        "description": "Prove that order now matters to the model:",
+        "code": "import torch\nimport torch.nn as nn\nimport math\n\n# Setup\nd_model = 128\ntoken_emb = nn.Embedding(100, d_model)\npos_enc = PositionalEncoding(d_model)\n\n# Same tokens, different order\nseq1 = torch.tensor([[10, 20, 30]])  # \"dog bites man\"\nseq2 = torch.tensor([[30, 20, 10]])  # \"man bites dog\"\n\n# Without positional encoding\nemb1_no_pos = token_emb(seq1)\nemb2_no_pos = token_emb(seq2)\n\n# The sum of embeddings is the same (order-independent!)\nsum1 = emb1_no_pos.sum(dim=1)\nsum2 = emb2_no_pos.sum(dim=1)\nprint(\"Without positional encoding:\")\nprint(f\"Seq1 sum == Seq2 sum: {torch.allclose(sum1, sum2)}\")\nprint(\"Model can't tell them apart!\\n\")\n\n# With positional encoding\nemb1_with_pos = pos_enc(token_emb(seq1))\nemb2_with_pos = pos_enc(token_emb(seq2))\n\n# Now the sums are different!\nsum1 = emb1_with_pos.sum(dim=1)\nsum2 = emb2_with_pos.sum(dim=1)\nprint(\"With positional encoding:\")\nprint(f\"Seq1 sum == Seq2 sum: {torch.allclose(sum1, sum2)}\")\nprint(\"Model can now distinguish word order!\")",
+        "explanation": "This demonstrates why positional encoding is critical. Without it, 'dog bites man' and 'man bites dog' would look identical to the attention mechanism. Position encoding breaks this symmetry."
+      }
+    ],
+    "keyPoints": [
+      "Self-attention is permutation-invariant—it ignores word order without positional encoding",
+      "Sinusoidal encoding uses sin/cos at different frequencies to create unique position patterns",
+      "Not learned—it's a fixed formula that works for any sequence length",
+      "Each dimension oscillates at a different frequency (high-freq = local, low-freq = global)",
+      "Added to embeddings before the first transformer layer",
+      "Alternative: learned positional embeddings (BERT uses this), but sinusoidal works better for long sequences"
+    ],
+    "realWorld": [
+      "GPT-3 uses learned positional embeddings up to 2048 tokens",
+      "GPT-4 extends this with techniques like ALiBi (Attention with Linear Biases) for longer contexts",
+      "Why it matters: 'I did not like it' vs 'I like it, not' have the same words but opposite meaning",
+      "Music generation models use positional encoding to track rhythm and timing",
+      "Code models use it to understand indentation and structure"
+    ],
+    "challenge": {
+      "unlocks": "position-encoding-explorer",
+      "preview": "Build a tool that visualizes positional encoding patterns in 2D! See how different frequencies create unique fingerprints for each position.",
+      "xp": 150
+    },
+    "easterEgg": "The original 'Attention Is All You Need' paper almost used learned positional embeddings instead of sinusoidal. They tested both and found nearly identical performance—but sinusoidal works for ANY sequence length, even longer than training! That's why GPT-4 can handle 32K+ tokens despite being trained on shorter sequences."
+  },
+  {
+    "id": "transformer-blocks",
+    "level": 9,
+    "title": "The Assembly Line",
+    "subtitle": "Stacking Attention + Intelligence",
+    "emoji": "🏗️",
+    "story": "You've built attention (focus), feedforward layers (thinking), and positional encoding (order). Now comes the magic: stacking them. Imagine an assembly line where each station refines the product. Station 1 (attention) looks at context. Station 2 (feedforward) processes that context. Station 3 (attention again) looks at the refined result. Each pass makes the understanding deeper. GPT-3 has 96 stations. GPT-4? Probably hundreds. Each transformer block is one station in this assembly line of intelligence.",
+    "hook": "One layer sees patterns. A hundred layers see meaning.",
+    "concept": "A transformer block combines multiple components in a specific architecture:\n\n1. **Multi-Head Self-Attention** - Each token looks at all others\n2. **Add & Norm** - Residual connection + layer normalization\n3. **Feedforward Network** - Two linear layers with activation (think, process)\n4. **Add & Norm** - Another residual connection + normalization\n\nThe residual connections (skip connections) are crucial—they let gradients flow backward during training and allow the model to learn 'deltas' instead of complete transformations. Layer normalization stabilizes training. These blocks stack to create deep networks: GPT-3 has 96 blocks, each refining the representation.",
+    "analogy": "**The Document Review Analogy:**\n\nImagine editing a document through multiple reviewers:\n\n**Round 1 (Block 1):**\n- **Attention:** \"Let me read the whole document and understand context\"\n- **Feedforward:** \"Based on that context, let me improve each sentence\"\n- **Residual:** \"Keep my original draft + my improvements (don't throw away the original!)\"\n\n**Round 2 (Block 2):**\n- **Attention:** \"Now re-read with the improvements from Round 1\"\n- **Feedforward:** \"Make even deeper edits based on this refined understanding\"\n- **Residual:** \"Add these refinements to the Round 1 version\"\n\n**Round 3-96:** Keep refining...\n\nFinal result: Each pass adds nuance. Early layers catch grammar, middle layers catch semantics, late layers catch reasoning.",
+    "visual": "TRANSFORMER BLOCK ARCHITECTURE:\n\nInput\n  │\n  ├─────────────────┐\n  │                 │\n  ▼                 │\nMulti-Head      (skip connection)\nAttention           │\n  │                 │\n  ▼                 │\n  +◄────────────────┘\n  │\n  ▼\nLayer Norm\n  │\n  ├─────────────────┐\n  │                 │\n  ▼                 │\nFeedforward     (skip connection)\nNetwork             │\n  │                 │\n  ▼                 │\n  +◄────────────────┘\n  │\n  ▼\nLayer Norm\n  │\n  ▼\nOutput (to next block)\n\nSTACKED BLOCKS (GPT-3):\n\nInput Embeddings\n        ↓\n   [Block 1]\n        ↓\n   [Block 2]\n        ↓\n   [Block 3]\n        ↓\n      ...\n        ↓\n   [Block 96]\n        ↓\n  Output Logits",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Feedforward Network (FFN)",
+        "description": "The 'thinking' component of each transformer block:",
+        "code": "import torch\nimport torch.nn as nn\n\nclass FeedForward(nn.Module):\n    def __init__(self, d_model, d_ff, dropout=0.1):\n        super().__init__()\n        # Two linear layers with GELU activation\n        self.linear1 = nn.Linear(d_model, d_ff)\n        self.linear2 = nn.Linear(d_ff, d_model)\n        self.dropout = nn.Dropout(dropout)\n        self.activation = nn.GELU()  # Gaussian Error Linear Unit\n    \n    def forward(self, x):\n        # Expand to d_ff dimensions, activate, project back\n        x = self.linear1(x)\n        x = self.activation(x)\n        x = self.dropout(x)\n        x = self.linear2(x)\n        return x\n\n# Example\nd_model = 512   # Model dimension\nd_ff = 2048     # FFN inner dimension (usually 4x d_model)\n\nffn = FeedForward(d_model, d_ff)\nx = torch.randn(2, 10, d_model)  # (batch=2, seq_len=10, d_model=512)\noutput = ffn(x)\n\nprint(f\"Input shape: {x.shape}\")\nprint(f\"Output shape: {output.shape}\")\nprint(f\"\\nFFN parameters: {sum(p.numel() for p in ffn.parameters()):,}\")\nprint(f\"The expansion to {d_ff} dims lets the model 'think' in higher dimensions!\")",
+        "explanation": "The FFN expands each token to a higher dimension (512→2048), applies non-linearity (GELU), then projects back (2048→512). This is where the model 'processes' what attention found. It's applied to each position independently."
+      },
+      {
+        "type": "code",
+        "title": "Complete Transformer Block",
+        "description": "Combine attention + FFN + residuals + normalization:",
+        "code": "import torch\nimport torch.nn as nn\n\nclass TransformerBlock(nn.Module):\n    def __init__(self, d_model, num_heads, d_ff, dropout=0.1):\n        super().__init__()\n        \n        # Multi-head attention\n        self.attention = nn.MultiheadAttention(\n            d_model, num_heads, dropout=dropout, batch_first=True\n        )\n        \n        # Feedforward network\n        self.ffn = FeedForward(d_model, d_ff, dropout)\n        \n        # Layer normalizations\n        self.norm1 = nn.LayerNorm(d_model)\n        self.norm2 = nn.LayerNorm(d_model)\n        \n        # Dropout\n        self.dropout = nn.Dropout(dropout)\n    \n    def forward(self, x, mask=None):\n        # Multi-head attention with residual connection\n        attn_output, _ = self.attention(x, x, x, attn_mask=mask)\n        x = x + self.dropout(attn_output)  # Residual\n        x = self.norm1(x)                   # Normalize\n        \n        # Feedforward with residual connection\n        ffn_output = self.ffn(x)\n        x = x + self.dropout(ffn_output)   # Residual\n        x = self.norm2(x)                   # Normalize\n        \n        return x\n\n# Example usage\nd_model = 512\nnum_heads = 8\nd_ff = 2048\n\nblock = TransformerBlock(d_model, num_heads, d_ff)\nx = torch.randn(2, 10, d_model)  # (batch, seq_len, d_model)\noutput = block(x)\n\nprint(f\"Input shape: {x.shape}\")\nprint(f\"Output shape: {output.shape}\")\nprint(f\"Shape preserved! Ready to stack more blocks.\")\nprint(f\"\\nBlock parameters: {sum(p.numel() for p in block.parameters()):,}\")",
+        "explanation": "Notice the residual connections: x = x + attention(x) and x = x + ffn(x). This is critical! Without residuals, deep networks can't train (vanishing gradients). The skip connections let information flow directly through the network."
+      },
+      {
+        "type": "code",
+        "title": "Stacking Multiple Blocks",
+        "description": "Create a deep transformer by stacking blocks:",
+        "code": "import torch\nimport torch.nn as nn\n\nclass StackedTransformer(nn.Module):\n    def __init__(self, num_blocks, d_model, num_heads, d_ff, dropout=0.1):\n        super().__init__()\n        \n        # Stack multiple transformer blocks\n        self.blocks = nn.ModuleList([\n            TransformerBlock(d_model, num_heads, d_ff, dropout)\n            for _ in range(num_blocks)\n        ])\n    \n    def forward(self, x, mask=None):\n        # Pass through each block sequentially\n        for block in self.blocks:\n            x = block(x, mask)\n        return x\n\n# Create a 12-layer transformer (like BERT-base)\nnum_blocks = 12\nd_model = 768\nnum_heads = 12\nd_ff = 3072  # 4 * d_model\n\nmodel = StackedTransformer(num_blocks, d_model, num_heads, d_ff)\n\nx = torch.randn(1, 50, d_model)  # One sequence of 50 tokens\noutput = model(x)\n\nprint(f\"Model depth: {num_blocks} blocks\")\nprint(f\"Input shape: {x.shape}\")\nprint(f\"Output shape: {output.shape}\")\nprint(f\"\\nTotal parameters: {sum(p.numel() for p in model.parameters()):,}\")\nprint(f\"\\nGPT-3 has 96 blocks with d_model=12,288!\")\nprint(f\"That's ~175 BILLION parameters.\")",
+        "explanation": "Each block refines the representation. Early blocks learn basic patterns (syntax, common phrases), middle blocks learn semantics, late blocks learn reasoning. The depth is what gives GPT its power."
+      },
+      {
+        "type": "code",
+        "title": "Visualizing Information Flow",
+        "description": "See how residual connections help gradients flow:",
+        "code": "import torch\nimport torch.nn as nn\n\n# Small example to show gradient flow\nd_model = 64\nblock = TransformerBlock(d_model, num_heads=4, d_ff=256)\n\n# Forward pass\nx = torch.randn(1, 5, d_model, requires_grad=True)\noutput = block(x)\n\n# Backward pass (compute gradients)\nloss = output.sum()\nloss.backward()\n\nprint(\"Gradient statistics:\")\nprint(f\"Input gradient mean: {x.grad.mean():.6f}\")\nprint(f\"Input gradient std: {x.grad.std():.6f}\")\nprint(f\"\\nWith residual connections, gradients flow cleanly!\")\nprint(f\"Without them, deep networks suffer from vanishing gradients.\")\nprint(f\"\\nThis is why transformers can be 96+ layers deep.\")",
+        "explanation": "Residual connections create 'gradient highways' through the network. Even in a 96-layer GPT-3, gradients can flow back to the first layer, enabling effective training. This is one of the key innovations that made transformers work."
+      }
+    ],
+    "keyPoints": [
+      "Transformer block = Attention + FFN, each with residual connection + normalization",
+      "Residual connections (skip connections) are critical for training deep networks",
+      "Layer normalization stabilizes training by normalizing activations",
+      "FFN expands to higher dimension (4x d_model), processes, then projects back",
+      "Blocks stack sequentially: output of block N → input of block N+1",
+      "Depth creates capability: 12 layers = BERT-base, 96 layers = GPT-3"
+    ],
+    "realWorld": [
+      "GPT-3 (175B): 96 blocks, d_model=12,288, num_heads=96, d_ff=49,152",
+      "GPT-2 (1.5B): 48 blocks, d_model=1,600, num_heads=25, d_ff=6,400",
+      "BERT-base: 12 blocks, d_model=768, num_heads=12, d_ff=3,072",
+      "Scaling law: Doubling layers roughly doubles capability (but 4x parameters!)",
+      "Why so wide? The FFN (d_ff=4×d_model) is where most parameters live"
+    ],
+    "challenge": {
+      "unlocks": "block-visualizer",
+      "preview": "Build a tool that shows information flow through stacked transformer blocks! See how representations evolve layer by layer.",
+      "xp": 150
+    },
+    "easterEgg": "Researchers found that different layers in GPT-3 specialize: layers 0-20 learn syntax, 20-60 learn semantics, 60-96 learn reasoning and world knowledge. You can actually 'freeze' early layers (stop training them) and only fine-tune late layers for specific tasks—early layers are universal!"
+  },
+  {
+    "id": "full-gpt-architecture",
+    "level": 10,
+    "title": "The Complete Blueprint",
+    "subtitle": "Assembling the AI Brain",
+    "emoji": "🧠",
+    "story": "You've learned the pieces: tokenization, embeddings, positional encoding, attention, feedforward networks, transformer blocks. Now it's time to assemble the full machine. Imagine you're building a car: you have the engine (attention), transmission (FFN), wheels (embeddings), frame (residuals). But how do you put them together? This lesson reveals the complete GPT architecture—from raw text input to probability distribution output. You'll see how ChatGPT goes from 'Hello' to predicting the next token with shocking accuracy.",
+    "hook": "Understanding the parts is one thing. Understanding the system is enlightenment.",
+    "concept": "The complete GPT architecture (decoder-only transformer):\n\n1. **Input:** Token IDs from tokenizer\n2. **Token Embedding:** Map IDs to vectors (learned)\n3. **Positional Encoding:** Add position information\n4. **Transformer Blocks:** Stack of N blocks (each = attention + FFN + residuals)\n5. **Layer Norm:** Final normalization\n6. **Output Projection:** Linear layer to vocabulary size\n7. **Softmax:** Convert to probability distribution\n\nKey: GPT is 'decoder-only' (vs BERT which is 'encoder-only'). It uses causal masking so each token can only attend to previous tokens (left-to-right). This enables autoregressive generation: predict next token, add it to sequence, repeat.",
+    "analogy": "**The Oracle Pipeline:**\n\nImagine a fortune teller's process:\n\n1. **Listen (Tokenization):** Hear your question, break it into key words\n2. **Encode (Embedding):** Translate words into 'mystical energy' (vectors)\n3. **Context (Positional):** Note the order—'will I find love' ≠ 'I will find love'\n4. **Divine (Attention):** Look at crystal ball, see how all words relate\n5. **Ponder (FFN):** Think deeply about what you saw\n6. **Refine (More blocks):** Gaze deeper, think harder (96 times!)\n7. **Speak (Output):** Convert visions into words, pick the most likely one\n\nGPT is this oracle, but instead of mysticism, it's math. Instead of 96 meditation cycles, it's 96 transformer blocks. The output? The next word in your story.",
+    "visual": "COMPLETE GPT ARCHITECTURE:\n\n\"Hello, how are\" → [Next word prediction]\n        |\n   TOKENIZER\n        |\n   [15496, 11, 703, 389] (token IDs)\n        |\n        ▼\n┌─────────────────────┐\n│  TOKEN EMBEDDING    │ ← Learned (50k × 768)\n│    [batch, seq, d]  │\n└─────────────────────┘\n        +\n┌─────────────────────┐\n│ POSITIONAL ENCODING │ ← Fixed (sinusoidal)\n│    [batch, seq, d]  │\n└─────────────────────┘\n        |\n        ▼\n┌─────────────────────┐\n│  DROPOUT (0.1)      │\n└─────────────────────┘\n        |\n        ▼\n   ╔═════════════════╗\n   ║ TRANSFORMER     ║\n   ║ BLOCK 1         ║ ← Attention + FFN\n   ╚═════════════════╝\n        |\n   ╔═════════════════╗\n   ║ TRANSFORMER     ║\n   ║ BLOCK 2         ║\n   ╚═════════════════╝\n        |\n       ...\n        |\n   ╔═════════════════╗\n   ║ TRANSFORMER     ║\n   ║ BLOCK N         ║\n   ╚═════════════════╝\n        |\n        ▼\n┌─────────────────────┐\n│   LAYER NORM        │\n└─────────────────────┘\n        |\n        ▼\n┌─────────────────────┐\n│ OUTPUT PROJECTION   │ ← [d → vocab_size]\n│   (LM Head)         │\n└─────────────────────┘\n        |\n        ▼\n┌─────────────────────┐\n│   SOFTMAX           │\n└─────────────────────┘\n        |\n        ▼\nProbabilities for all 50k tokens:\n[0.001, 0.002, ..., 0.234, ...]\n                       ^\n                     \"you\" (most likely!)",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Complete GPT Model",
+        "description": "Build the full architecture from scratch:",
+        "code": "import torch\nimport torch.nn as nn\nimport math\n\nclass GPT(nn.Module):\n    def __init__(self, vocab_size, d_model, num_heads, num_blocks, d_ff, max_len, dropout=0.1):\n        super().__init__()\n        \n        # Token embeddings\n        self.token_embedding = nn.Embedding(vocab_size, d_model)\n        \n        # Positional encoding\n        self.pos_encoding = self._create_positional_encoding(max_len, d_model)\n        \n        # Transformer blocks\n        self.blocks = nn.ModuleList([\n            TransformerBlock(d_model, num_heads, d_ff, dropout)\n            for _ in range(num_blocks)\n        ])\n        \n        # Final layer norm\n        self.ln_final = nn.LayerNorm(d_model)\n        \n        # Output projection (to vocabulary)\n        self.lm_head = nn.Linear(d_model, vocab_size, bias=False)\n        \n        # Dropout\n        self.dropout = nn.Dropout(dropout)\n        \n        # Initialize weights\n        self.apply(self._init_weights)\n    \n    def _create_positional_encoding(self, max_len, d_model):\n        pe = torch.zeros(max_len, d_model)\n        position = torch.arange(0, max_len).unsqueeze(1)\n        div_term = torch.exp(torch.arange(0, d_model, 2) * \n                            -(math.log(10000.0) / d_model))\n        pe[:, 0::2] = torch.sin(position * div_term)\n        pe[:, 1::2] = torch.cos(position * div_term)\n        return nn.Parameter(pe, requires_grad=False)\n    \n    def _init_weights(self, module):\n        if isinstance(module, nn.Linear):\n            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)\n            if module.bias is not None:\n                torch.nn.init.zeros_(module.bias)\n        elif isinstance(module, nn.Embedding):\n            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)\n    \n    def forward(self, token_ids, mask=None):\n        batch_size, seq_len = token_ids.shape\n        \n        # Get token embeddings\n        x = self.token_embedding(token_ids)\n        \n        # Add positional encoding\n        x = x + self.pos_encoding[:seq_len, :]\n        x = self.dropout(x)\n        \n        # Pass through transformer blocks\n        for block in self.blocks:\n            x = block(x, mask)\n        \n        # Final layer norm\n        x = self.ln_final(x)\n        \n        # Project to vocabulary\n        logits = self.lm_head(x)\n        \n        return logits\n\n# Create a GPT-2 Small equivalent\nvocab_size = 50257\nd_model = 768\nnum_heads = 12\nnum_blocks = 12\nd_ff = 3072  # 4 * d_model\nmax_len = 1024\n\nmodel = GPT(vocab_size, d_model, num_heads, num_blocks, d_ff, max_len)\n\nprint(f\"Model created!\")\nprint(f\"Parameters: {sum(p.numel() for p in model.parameters()):,}\")\nprint(f\"\\nThis is equivalent to GPT-2 Small (117M parameters)!\")",
+        "explanation": "This is the complete GPT architecture! Notice how simple it is conceptually: embeddings → blocks → output. The power comes from the depth (12 blocks) and width (768 dimensions)."
+      },
+      {
+        "type": "code",
+        "title": "Forward Pass Example",
+        "description": "See how input flows through the model:",
+        "code": "import torch\n\n# Create model\nmodel = GPT(\n    vocab_size=50257,\n    d_model=768,\n    num_heads=12,\n    num_blocks=12,\n    d_ff=3072,\n    max_len=1024\n)\n\n# Input: \"Hello, how are\"\ntoken_ids = torch.tensor([[15496, 11, 703, 389]])  # (batch=1, seq=4)\n\nprint(f\"Input shape: {token_ids.shape}\")\nprint(f\"Input tokens: {token_ids}\")\n\n# Forward pass\nlogits = model(token_ids)\n\nprint(f\"\\nOutput logits shape: {logits.shape}\")  # (1, 4, 50257)\nprint(f\"For each of 4 positions, we predict over 50,257 possible next tokens!\")\n\n# Get predictions for the last token position\nlast_token_logits = logits[0, -1, :]  # Shape: (50257,)\nprobabilities = torch.softmax(last_token_logits, dim=-1)\n\n# Top 5 predictions\ntop5_probs, top5_indices = torch.topk(probabilities, 5)\n\nprint(f\"\\nTop 5 next token predictions:\")\nfor prob, idx in zip(top5_probs, top5_indices):\n    print(f\"  Token {idx.item()}: {prob.item():.4f} ({prob.item()*100:.2f}%)\")",
+        "explanation": "The model outputs logits (raw scores) for EVERY token in the vocabulary at EVERY position. We typically care about the last position (next token prediction). Softmax converts logits to probabilities."
+      },
+      {
+        "type": "code",
+        "title": "Causal Masking (Autoregressive)",
+        "description": "Prevent looking into the future:",
+        "code": "import torch\nimport torch.nn.functional as F\n\ndef create_causal_mask(seq_len):\n    # Create a lower triangular matrix\n    # True = allowed to attend, False = masked\n    mask = torch.tril(torch.ones(seq_len, seq_len))\n    # Convert to attention mask format (0 = attend, -inf = mask)\n    mask = mask.masked_fill(mask == 0, float('-inf'))\n    mask = mask.masked_fill(mask == 1, 0.0)\n    return mask\n\n# Example\nseq_len = 5\nmask = create_causal_mask(seq_len)\n\nprint(\"Causal attention mask:\")\nprint(mask)\nprint(\"\\nThis ensures each token can only attend to itself and previous tokens!\")\nprint(\"\\nExample: Token at position 3 can attend to positions [0, 1, 2, 3]\")\nprint(\"         but NOT position 4 (that's the future!)\")\n\n# Visualize what each position can see\nfor i in range(seq_len):\n    visible = [j for j in range(seq_len) if mask[i, j] == 0.0]\n    print(f\"Position {i} can see: {visible}\")",
+        "explanation": "Causal masking is what makes GPT 'autoregressive'—it generates left-to-right, one token at a time. During training, this prevents cheating (looking at future tokens). During generation, it's how we build sentences incrementally."
+      },
+      {
+        "type": "code",
+        "title": "Text Generation",
+        "description": "Generate new text with the model:",
+        "code": "import torch\nimport torch.nn.functional as F\n\ndef generate(model, start_tokens, max_new_tokens, temperature=1.0):\n    model.eval()\n    tokens = start_tokens.clone()\n    \n    for _ in range(max_new_tokens):\n        # Get predictions\n        with torch.no_grad():\n            logits = model(tokens)\n        \n        # Get logits for last position\n        next_token_logits = logits[0, -1, :] / temperature\n        \n        # Sample from distribution\n        probs = F.softmax(next_token_logits, dim=-1)\n        next_token = torch.multinomial(probs, num_samples=1)\n        \n        # Append to sequence\n        tokens = torch.cat([tokens, next_token.unsqueeze(0)], dim=1)\n    \n    return tokens\n\n# Example (won't work without trained model, but shows the process)\nstart_tokens = torch.tensor([[15496, 11]])  # \"Hello,\"\nprint(\"Starting with: 'Hello,'\")\nprint(\"\\nGenerating 10 more tokens...\")\n\n# In a real scenario:\n# generated = generate(model, start_tokens, max_new_tokens=10)\n# print(f\"Generated sequence: {generated}\")\n\nprint(\"\\nThis is how ChatGPT generates responses!\")\nprint(\"Temperature controls randomness:\")\nprint(\"  - Low (0.1): Deterministic, picks most likely token\")\nprint(\"  - High (1.5): Creative, samples from broader distribution\")",
+        "explanation": "Generation is simple: (1) Get predictions (2) Sample next token (3) Append to sequence (4) Repeat. The model sees the growing sequence and predicts what comes next. This is autoregressive generation—the core of GPT."
+      }
+    ],
+    "keyPoints": [
+      "GPT = Embeddings + Positional Encoding + Stacked Transformer Blocks + Output Projection",
+      "Decoder-only architecture: generates left-to-right using causal masking",
+      "Each position outputs logits for all vocabulary tokens (next-token prediction)",
+      "Causal mask prevents attending to future tokens (maintains autoregressive property)",
+      "Generation: predict → sample → append → repeat",
+      "Temperature controls randomness: low = deterministic, high = creative"
+    ],
+    "realWorld": [
+      "GPT-3 (175B): 96 layers, 12,288 hidden dim, 96 heads, trained on 300B tokens",
+      "GPT-4: Likely 120+ layers, rumored to be ~1.7T parameters (8 expert models)",
+      "Training cost: GPT-3 cost ~$4.6M to train once. GPT-4 likely $50M+",
+      "ChatGPT uses temperature ~0.7 for conversation (balanced creativity/coherence)",
+      "Code generation uses lower temperature ~0.2 (more deterministic)",
+      "Creative writing uses higher temperature ~1.2 (more surprising outputs)"
+    ],
+    "challenge": {
+      "unlocks": "build-your-own-gpt",
+      "preview": "Your final challenge: Train a tiny GPT from scratch on real text! You'll implement the full architecture, training loop, and generation. See a language model learn to speak!",
+      "xp": 200
+    },
+    "easterEgg": "Mind-blowing fact: GPT-3 has 175 billion parameters, but each parameter is just a single floating-point number. If you printed them all at 10 numbers per line, it would be a 17.5 billion page book—that would stretch from Earth to the Moon and back 23 times. Yet it all fits on a single GPU cluster. The entire 'intelligence' of ChatGPT is just 700GB of numbers."
   }
 ]

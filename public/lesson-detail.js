@@ -22,11 +22,56 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   
+  // Check if lesson is unlocked before loading
+  await checkLessonAccess();
+  
   await loadLesson();
   await loadQuiz();
   await loadCodeExercise();
   initPyodide();
 });
+
+// Check if user has access to this lesson
+async function checkLessonAccess() {
+  try {
+    const progressResponse = await fetch(`${API_BASE}/api/progress`);
+    const progress = await progressResponse.json();
+    
+    const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
+    const lessons = await lessonsResponse.json();
+    
+    const currentLessonIndex = lessons.findIndex(l => l.id === lessonId);
+    
+    if (currentLessonIndex === -1) {
+      console.error('Lesson not found:', lessonId);
+      alert('Lesson not found');
+      window.location.href = 'lessons.html';
+      return;
+    }
+    
+    // First lesson is always unlocked
+    if (currentLessonIndex === 0) {
+      console.log('✅ First lesson - access granted');
+      return;
+    }
+    
+    // Check if previous lesson is completed
+    const previousLesson = lessons[currentLessonIndex - 1];
+    const completedLessons = progress.completedLessons || [];
+    
+    if (!completedLessons.includes(previousLesson.id)) {
+      console.warn('⚠️ Previous lesson not completed:', previousLesson.id);
+      alert(`Please complete "${previousLesson.title}" first`);
+      window.location.href = 'lessons.html';
+      return;
+    }
+    
+    console.log('✅ Lesson access granted:', lessonId);
+  } catch (error) {
+    console.error('Error checking lesson access:', error);
+    // Allow access on error (fail open)
+  }
+}
 
 // Load lesson content
 async function loadLesson() {
@@ -243,19 +288,50 @@ function renderCodeExercise() {
   const exercise = codeExercises[0];
   document.getElementById('code-instructions').textContent = exercise.instructions;
   
-  // Initialize Monaco editor
-  if (!editor) {
-    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
-    require(['vs/editor/editor.main'], function () {
-      editor = monaco.editor.create(document.getElementById('code-editor'), {
-        value: exercise.starterCode || '# Write your code here\n',
-        language: 'python',
-        theme: 'vs-dark',
-        minimap: { enabled: false },
-        fontSize: 14,
-        automaticLayout: true
+  // Detect mobile (use simple textarea instead of Monaco)
+  const isMobile = window.innerWidth < 768;
+  
+  if (isMobile) {
+    // Use simple textarea for mobile
+    const editorDiv = document.getElementById('code-editor');
+    editorDiv.innerHTML = `
+      <textarea id="simple-editor" style="
+        width: 100%;
+        height: 400px;
+        padding: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        resize: vertical;
+      ">${exercise.starterCode || '# Write your code here\n'}</textarea>
+    `;
+    
+    // Create simple editor interface
+    editor = {
+      getValue: () => document.getElementById('simple-editor').value,
+      setValue: (val) => { document.getElementById('simple-editor').value = val; }
+    };
+    
+    console.log('✅ Using mobile-friendly textarea editor');
+  } else {
+    // Initialize Monaco editor for desktop
+    if (!editor) {
+      require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+      require(['vs/editor/editor.main'], function () {
+        editor = monaco.editor.create(document.getElementById('code-editor'), {
+          value: exercise.starterCode || '# Write your code here\n',
+          language: 'python',
+          theme: 'vs-dark',
+          minimap: { enabled: false },
+          fontSize: 14,
+          automaticLayout: true
+        });
+        console.log('✅ Monaco editor loaded');
       });
-    });
+    }
   }
   
   // Setup hints
@@ -350,14 +426,22 @@ function appendToConsole(text, type = 'output') {
 // Complete lesson
 async function completeLesson() {
   try {
+    console.log('📝 Completing lesson:', lessonId);
+    
     const response = await fetch(`${API_BASE}/api/lessons/${lessonId}/complete`, {
       method: 'POST'
     });
     
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
     
     const result = await response.json();
-    console.log('Lesson completed:', result);
+    console.log('✅ Lesson completed successfully:', result);
+    console.log('Total XP:', result.xp);
+    console.log('XP gained:', result.xpGained);
+    console.log('Completed lessons count:', result.completedLessons);
     
     // Show completion step
     currentStep = 4;
@@ -375,7 +459,7 @@ async function completeLesson() {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (error) {
-    console.error('Failed to complete lesson:', error);
+    console.error('❌ Failed to complete lesson:', error);
     alert('Error completing lesson: ' + error.message);
   }
 }
@@ -383,16 +467,25 @@ async function completeLesson() {
 // Go to next lesson
 async function nextLesson() {
   try {
-    const response = await fetch(`${API_BASE}/api/lessons`);
-    const lessons = await response.json();
+    console.log('Finding next lesson...');
     
-    const progressResponse = await fetch(`${API_BASE}/api/progress`);
+    // Force reload progress from server (no cache)
+    const progressResponse = await fetch(`${API_BASE}/api/progress?_=${Date.now()}`);
     const progress = await progressResponse.json();
+    
+    console.log('Current progress:', progress);
+    console.log('Completed lessons:', progress.completedLessons);
+    
+    const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
+    const lessons = await lessonsResponse.json();
     
     const completedLessons = progress.completedLessons || [];
     const nextLesson = lessons.find(l => !completedLessons.includes(l.id));
     
+    console.log('Next uncompleted lesson:', nextLesson ? nextLesson.id : 'none');
+    
     if (nextLesson) {
+      console.log('Navigating to:', nextLesson.id);
       window.location.href = `lesson-detail.html?id=${nextLesson.id}`;
     } else {
       alert('🎉 All lessons complete!');
@@ -400,6 +493,7 @@ async function nextLesson() {
     }
   } catch (error) {
     console.error('Error finding next lesson:', error);
+    alert('Error loading next lesson. Returning to lessons list.');
     window.location.href = 'lessons.html';
   }
 }
