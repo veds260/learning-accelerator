@@ -50,6 +50,9 @@ console.log('Runtime dir:', RUNTIME_DIR);
 const PROGRESS_FILE = path.join(RUNTIME_DIR, 'progress.json');
 const QUIZ_FILE = path.join(RUNTIME_DIR, 'quiz-state.json');
 const LESSON_CONTENT_FILE = path.join(STATIC_DIR, 'lesson-content.json');
+const LESSONS_6_10_FILE = path.join(STATIC_DIR, 'lessons-6-10.json');
+const LESSONS_11_15_FILE = path.join(STATIC_DIR, 'lessons-11-15.json');
+const LESSONS_16_20_FILE = path.join(STATIC_DIR, 'lessons-16-20.json');
 const CHALLENGES_FILE = path.join(STATIC_DIR, 'manning-challenges.json');
 const FLASHCARDS_FILE = path.join(STATIC_DIR, 'flashcards.json');
 const QUIZ_QUESTIONS_FILE = path.join(STATIC_DIR, 'quiz-questions.json');
@@ -282,17 +285,50 @@ app.get('/api/dashboard', async (req, res) => {
   }
 });
 
+// Load all lessons from multiple files
+function loadAllLessons() {
+  let allLessons = [];
+  
+  // Load lessons 1-5 (foundation)
+  if (fs.existsSync(LESSON_CONTENT_FILE)) {
+    const lessons1_5 = readJSON(LESSON_CONTENT_FILE);
+    allLessons = allLessons.concat(lessons1_5);
+  }
+  
+  // Load lessons 6-10 (core architecture)
+  if (fs.existsSync(LESSONS_6_10_FILE)) {
+    const lessons6_10 = readJSON(LESSONS_6_10_FILE);
+    allLessons = allLessons.concat(lessons6_10);
+  }
+  
+  // Load lessons 11-15 (training)
+  if (fs.existsSync(LESSONS_11_15_FILE)) {
+    const lessons11_15 = readJSON(LESSONS_11_15_FILE);
+    allLessons = allLessons.concat(lessons11_15);
+  }
+  
+  // Load lessons 16-20 (advanced)
+  if (fs.existsSync(LESSONS_16_20_FILE)) {
+    const lessons16_20 = readJSON(LESSONS_16_20_FILE);
+    allLessons = allLessons.concat(lessons16_20);
+  }
+  
+  return allLessons;
+}
+
 // Lessons
 app.get('/api/lessons', async (req, res) => {
   try {
-    if (!fs.existsSync(LESSON_CONTENT_FILE)) {
-      console.error('Lesson file not found at:', LESSON_CONTENT_FILE);
+    const lessons = loadAllLessons();
+    
+    if (lessons.length === 0) {
+      console.error('No lessons found!');
       return res.status(404).json({ 
-        error: 'Lesson content not found',
-        path: LESSON_CONTENT_FILE
+        error: 'No lesson content found'
       });
     }
-    const lessons = readJSON(LESSON_CONTENT_FILE);
+    
+    console.log(`📚 Loaded ${lessons.length} total lessons`);
     res.json(lessons);
   } catch (error) {
     console.error('❌ ERROR in /api/lessons:');
@@ -307,10 +343,12 @@ app.get('/api/lessons', async (req, res) => {
 
 app.get('/api/lessons/:id', async (req, res) => {
   try {
-    const lessons = readJSON(LESSON_CONTENT_FILE);
+    const lessons = loadAllLessons();
     const lesson = lessons.find(l => l.id === req.params.id);
     
     if (!lesson) {
+      console.error(`Lesson not found: ${req.params.id}`);
+      console.log(`Available lessons: ${lessons.map(l => l.id).join(', ')}`);
       return res.status(404).json({ error: 'Lesson not found' });
     }
     
@@ -327,7 +365,7 @@ app.get('/api/lessons/:id', async (req, res) => {
 app.post('/api/lessons/:id/complete', async (req, res) => {
   try {
     const progress = readJSON(PROGRESS_FILE);
-    const lessons = readJSON(LESSON_CONTENT_FILE);
+    const lessons = loadAllLessons();
     const lesson = lessons.find(l => l.id === req.params.id);
     
     if (!lesson) {
