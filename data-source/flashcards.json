@@ -1,0 +1,291 @@
+{
+  "cards": [
+    {
+      "id": "1",
+      "front": "Why do we need tokenization in LLMs?",
+      "back": "Neural networks can only process numbers, not raw text. Tokenization converts text into numeric IDs that the model can work with. It also reduces vocabulary size compared to character-level encoding while maintaining semantic meaning better than word-level encoding.",
+      "concept": "tokenization",
+      "tier": "foundation",
+      "manningChapter": "2.2",
+      "manningVideo": 2
+    },
+    {
+      "id": "2",
+      "front": "What is Byte Pair Encoding (BPE) and why is it used?",
+      "back": "BPE is a tokenization algorithm that iteratively merges the most frequent pairs of characters/tokens to build a vocabulary. It balances between character-level (too long) and word-level (too large vocab) encoding. Used in GPT models because it handles rare words well and keeps vocab size manageable (~50k tokens).",
+      "concept": "tokenization",
+      "tier": "foundation",
+      "manningChapter": "2.5",
+      "manningVideo": 5
+    },
+    {
+      "id": "3",
+      "front": "What are special tokens like <|endoftext|> and why do we need them?",
+      "back": "Special tokens mark boundaries and special contexts. <|endoftext|> separates different documents during training. <|unk|> represents unknown/rare tokens. They help the model understand document structure and handle edge cases.",
+      "concept": "tokenization",
+      "tier": "foundation",
+      "manningChapter": "2.4",
+      "manningVideo": 4
+    },
+    {
+      "id": "4",
+      "front": "What is the sliding window technique for creating training data?",
+      "back": "Sliding window creates overlapping sequences from text by moving a fixed-size window forward by a stride. For example, with window=4 and stride=1: 'ABCDEFG' becomes (ABCD→E), (BCDE→F), (CDEF→G). This efficiently generates many training examples from limited text.",
+      "concept": "data-preparation",
+      "tier": "foundation",
+      "manningChapter": "2.6",
+      "manningVideo": 6
+    },
+    {
+      "id": "5",
+      "front": "What is the purpose of token embeddings?",
+      "back": "Token embeddings convert discrete token IDs into continuous vector representations. Similar tokens get similar vectors, capturing semantic relationships (e.g., 'king' and 'queen' are closer than 'king' and 'car'). This learned representation enables the model to understand meaning.",
+      "concept": "embeddings",
+      "tier": "foundation",
+      "manningChapter": "2.7",
+      "manningVideo": 7
+    },
+    {
+      "id": "6",
+      "front": "Why do we need positional encodings in transformers?",
+      "back": "Transformers process all tokens in parallel, so they have no inherent sense of order (unlike RNNs). Positional encodings add position information to embeddings, allowing the model to know that 'cat sat' and 'sat cat' are different. Without them, all permutations would be treated identically.",
+      "concept": "embeddings",
+      "tier": "foundation",
+      "manningChapter": "2.8",
+      "manningVideo": 8
+    },
+    {
+      "id": "7",
+      "front": "Explain self-attention in one sentence.",
+      "back": "Self-attention allows each token to 'look at' all other tokens in the sequence and decide how much to focus on each one when computing its representation.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.3",
+      "manningVideo": 9
+    },
+    {
+      "id": "8",
+      "front": "What are Query, Key, and Value in attention?",
+      "back": "Query (Q): 'what I'm looking for' - the current token's search vector. Key (K): 'what I offer' - each token's indexable content. Value (V): 'what I contain' - the actual information to retrieve. Attention computes Q·K to find relevance, then retrieves V.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.4",
+      "manningVideo": 10
+    },
+    {
+      "id": "9",
+      "front": "Write the scaled dot-product attention formula.",
+      "back": "Attention(Q, K, V) = softmax(QK^T / √d_k) V\n\nWhere d_k is the dimension of keys. The √d_k scaling prevents softmax saturation when dimensions are large.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.4",
+      "manningVideo": 11
+    },
+    {
+      "id": "10",
+      "front": "What is a causal mask and why is it essential for GPT?",
+      "back": "Causal mask is an upper triangular matrix that prevents tokens from attending to future tokens. Essential for autoregressive generation - during training, token i can only see tokens 1...i, not i+1...n. This ensures the model learns to predict next tokens without 'cheating'.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.5.1",
+      "manningVideo": 13
+    },
+    {
+      "id": "11",
+      "front": "Why use dropout on attention weights?",
+      "back": "Dropout randomly zeros some attention weights during training, forcing the model to learn redundant attention patterns. This prevents overfitting and makes the model more robust. Typical rate: 0.1-0.3 for attention.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.5.2",
+      "manningVideo": 14
+    },
+    {
+      "id": "12",
+      "front": "What is multi-head attention and what's the benefit?",
+      "back": "Multi-head attention runs multiple attention mechanisms in parallel (e.g., 12 heads), each learning different patterns. One head might focus on syntax, another on semantics. Outputs are concatenated and projected. Benefit: model learns richer, more diverse relationships than single-head attention.",
+      "concept": "multi-head-attention",
+      "tier": "intermediate",
+      "manningChapter": "3.6",
+      "manningVideo": 16
+    },
+    {
+      "id": "13",
+      "front": "How are embeddings split across attention heads?",
+      "back": "If d_model=768 and num_heads=12, each head gets d_k = 768/12 = 64 dimensions. The embedding is split, not copied. Each head computes attention on its slice, then all outputs are concatenated back to 768 dimensions.",
+      "concept": "multi-head-attention",
+      "tier": "intermediate",
+      "manningChapter": "3.6.2",
+      "manningVideo": 17
+    },
+    {
+      "id": "14",
+      "front": "What is Layer Normalization and why is it used in transformers?",
+      "back": "LayerNorm normalizes activations across the feature dimension (not batch like BatchNorm). It stabilizes training, enables higher learning rates, and works well with variable sequence lengths. Applied before/after each sub-layer in transformers.",
+      "concept": "architecture",
+      "tier": "advanced",
+      "manningChapter": "4.2",
+      "manningVideo": 19
+    },
+    {
+      "id": "15",
+      "front": "What is GELU activation and how does it differ from ReLU?",
+      "back": "GELU (Gaussian Error Linear Unit) is a smooth activation: x * Φ(x) where Φ is CDF of standard normal. Unlike ReLU (hard cutoff at 0), GELU is smooth and allows small negative values. Used in GPT/BERT because smoothness helps gradient flow.",
+      "concept": "architecture",
+      "tier": "advanced",
+      "manningChapter": "4.3",
+      "manningVideo": 20
+    },
+    {
+      "id": "16",
+      "front": "What's the typical size of the feedforward layer in transformers?",
+      "back": "FFN typically has 4× hidden dimension: d_model → 4*d_model → d_model. For GPT-2 small (d_model=768), FFN is 768 → 3072 → 768. This is where most parameters live (~2/3 of total).",
+      "concept": "architecture",
+      "tier": "advanced",
+      "manningChapter": "4.3",
+      "manningVideo": 20
+    },
+    {
+      "id": "17",
+      "front": "What is the context length and why does it matter?",
+      "back": "Maximum sequence length the model can process (e.g., 2048 tokens for GPT-2). Limited by: 1) memory (attention is O(n²)), 2) positional encodings. Longer context = better understanding but slower + more memory. Models trained with specific context length.",
+      "concept": "architecture",
+      "tier": "intermediate",
+      "manningChapter": "2.6",
+      "manningVideo": 6
+    },
+    {
+      "id": "18",
+      "front": "What causes the 'attention is all you need' revolution?",
+      "back": "Transformers replaced RNNs/LSTMs by using attention for all sequence modeling. Benefits: 1) Parallelizable (RNNs are sequential), 2) Longer-range dependencies, 3) More interpretable (attention weights show what model focuses on), 4) Better gradient flow.",
+      "concept": "architecture",
+      "tier": "intermediate",
+      "manningChapter": "3.1",
+      "manningVideo": 9
+    },
+    {
+      "id": "19",
+      "front": "What's the computational complexity of self-attention?",
+      "back": "O(n² * d) where n is sequence length, d is embedding dimension. The n² comes from computing all pairwise attention scores. This is why very long sequences (>10k tokens) are expensive. Optimizations: sparse attention, linear attention, sliding windows.",
+      "concept": "attention",
+      "tier": "advanced",
+      "manningChapter": "3.4",
+      "manningVideo": 10
+    },
+    {
+      "id": "20",
+      "front": "Why is tokenizer vocabulary size typically ~50k?",
+      "back": "Tradeoff: smaller vocab = longer sequences (slow, worse long-range), larger vocab = huge embedding matrix (memory, rare tokens undertrained). 50k balances efficiency and coverage. BPE naturally reaches this size on English text. GPT uses 50,257 tokens.",
+      "concept": "tokenization",
+      "tier": "foundation",
+      "manningChapter": "2.5",
+      "manningVideo": 5
+    },
+    {
+      "id": "21",
+      "front": "What is the curse of dimensionality in embeddings?",
+      "back": "In high dimensions (e.g., 768), almost all points are far apart and equidistant. But this is fine for neural networks - they learn meaningful structure in high-D space that doesn't exist in low-D projections. Embeddings need high dimensions to capture complex semantics.",
+      "concept": "embeddings",
+      "tier": "foundation",
+      "manningChapter": "2.7",
+      "manningVideo": 7
+    },
+    {
+      "id": "22",
+      "front": "How does BPE handle unknown words?",
+      "back": "BPE breaks words into subword units. Even if a word wasn't in training data, its subwords likely were. Example: 'unhappiness' might be 'un' + 'happi' + 'ness'. This allows BPE to handle infinite vocabulary with finite subword units.",
+      "concept": "tokenization",
+      "tier": "foundation",
+      "manningChapter": "2.5",
+      "manningVideo": 5
+    },
+    {
+      "id": "23",
+      "front": "What is the difference between absolute and relative positional encoding?",
+      "back": "Absolute: each position gets a unique embedding (position 1, 2, 3...). Relative: encode distance between tokens (token i attending to i-3). GPT-2 uses absolute, some newer models use relative for better length generalization.",
+      "concept": "embeddings",
+      "tier": "intermediate",
+      "manningChapter": "2.8",
+      "manningVideo": 8
+    },
+    {
+      "id": "24",
+      "front": "Why do we apply softmax to attention scores?",
+      "back": "Softmax converts raw attention scores into a probability distribution (sums to 1). This ensures attention weights are interpretable as 'how much to focus on each token'. Also provides gradient stability during backprop.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.4",
+      "manningVideo": 10
+    },
+    {
+      "id": "25",
+      "front": "What happens if you remove the causal mask from GPT?",
+      "back": "The model becomes bidirectional (like BERT). During training, each token can see future tokens, so it learns to cheat rather than learn to predict. At inference, you can't generate autoregressively because the model expects to see the full sequence.",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.5.1",
+      "manningVideo": 13
+    },
+    {
+      "id": "26",
+      "front": "How many parameters are in the multi-head attention layer?",
+      "back": "For d_model and h heads: 4 * d_model² (Q, K, V, and output projections each have d_model × d_model weights). For GPT-2 small (d_model=768): 4 * 768² ≈ 2.4M parameters per attention layer.",
+      "concept": "multi-head-attention",
+      "tier": "advanced",
+      "manningChapter": "3.6",
+      "manningVideo": 17
+    },
+    {
+      "id": "27",
+      "front": "Why does GELU work better than ReLU in transformers?",
+      "back": "GELU is smooth (differentiable everywhere) while ReLU has a hard cutoff at 0. Smoothness provides better gradient flow in deep networks. GELU also allows small negative values through (weighted by Gaussian CDF), which helps with feature learning.",
+      "concept": "architecture",
+      "tier": "advanced",
+      "manningChapter": "4.3",
+      "manningVideo": 20
+    },
+    {
+      "id": "28",
+      "front": "What does LayerNorm do mathematically?",
+      "back": "For each sample, normalize across features: y = (x - mean(x)) / sqrt(var(x) + ε), then apply learned scale γ and bias β: output = γ*y + β. This makes each layer's inputs have mean=0, var=1, then shifts/scales to optimal range.",
+      "concept": "architecture",
+      "tier": "advanced",
+      "manningChapter": "4.2",
+      "manningVideo": 19
+    },
+    {
+      "id": "29",
+      "front": "Why use learned positional embeddings instead of fixed sine/cosine?",
+      "back": "Learned embeddings can adapt to the specific task and data. Fixed sine/cosine encodings have theoretical benefits (can extrapolate to longer sequences), but learned often work better in practice for fixed-length sequences. GPT-2 uses learned.",
+      "concept": "embeddings",
+      "tier": "intermediate",
+      "manningChapter": "2.8",
+      "manningVideo": 8
+    },
+    {
+      "id": "30",
+      "front": "How does dropout prevent overfitting in attention?",
+      "back": "By randomly dropping attention connections during training, the model can't rely on any single pathway. This forces learning of robust, redundant patterns. At test time, dropout is off and all connections are used (scaled appropriately).",
+      "concept": "attention",
+      "tier": "intermediate",
+      "manningChapter": "3.5.2",
+      "manningVideo": 14
+    }
+  ],
+  "stats": {
+    "total": 30,
+    "byTier": {
+      "foundation": 9,
+      "intermediate": 13,
+      "advanced": 8
+    },
+    "byConcept": {
+      "tokenization": 5,
+      "embeddings": 5,
+      "data-preparation": 1,
+      "attention": 10,
+      "multi-head-attention": 3,
+      "architecture": 6
+    },
+    "coverageNote": "Covers Manning videos 1-20 only (Ch 2-3 complete, Ch 4.1-4.3 partial)"
+  }
+}

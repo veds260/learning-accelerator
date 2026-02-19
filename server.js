@@ -25,6 +25,24 @@ if (!fs.existsSync(path.join(__dirname, 'data'))) {
   fs.mkdirSync(path.join(__dirname, 'data'));
 }
 
+// Copy source files from data-source to data (for Railway volume mount)
+// This ensures static source files are available even when data/ is a volume
+const sourceFiles = ['lesson-content.json', 'flashcards.json', 'manning-challenges.json', 'manning-videos.json', 'manning-playlist.json'];
+sourceFiles.forEach(file => {
+  const sourcePath = path.join(__dirname, 'data-source', file);
+  const destPath = path.join(__dirname, 'data', file);
+  
+  // Only copy if source exists and destination doesn't (don't overwrite)
+  if (fs.existsSync(sourcePath) && !fs.existsSync(destPath)) {
+    try {
+      fs.copyFileSync(sourcePath, destPath);
+      console.log(`✅ Copied ${file} to data directory`);
+    } catch (err) {
+      console.error(`❌ Failed to copy ${file}:`, err.message);
+    }
+  }
+});
+
 // Initialize data files if they don't exist
 function initDataFiles() {
   if (!fs.existsSync(PROGRESS_FILE)) {

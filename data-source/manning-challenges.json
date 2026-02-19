@@ -1,0 +1,158 @@
+[
+  {
+    "id": "tokenizer-from-scratch",
+    "title": "Build Your Own Tokenizer",
+    "description": "Implement tokenization from scratch following Manning Ch 2.2-2.5",
+    "timeEstimate": "3-4 hours",
+    "xp": 100,
+    "tier": "foundation",
+    "manningChapters": ["2.2", "2.3", "2.4", "2.5"],
+    "manningVideos": [2, 3, 4, 5],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=Iuwqyddco",
+      "https://www.youtube.com/watch?v=5uEwiN_9hJk",
+      "https://www.youtube.com/watch?v=jA7kx6cTKVE",
+      "https://www.youtube.com/watch?v=ePfY7P0iNik"
+    ],
+    "tasks": [
+      "Watch Manning videos 2-5 (44 min total)",
+      "Implement basic text tokenizer (split by whitespace + punctuation)",
+      "Build token-to-ID vocabulary mapping",
+      "Add special tokens (<|endoftext|>, <|unk|>)",
+      "Implement Byte Pair Encoding (BPE) algorithm",
+      "Test on real text samples and compare with tiktoken"
+    ],
+    "winCondition": "Tokenizer handles any text input, outputs token IDs, BPE reduces vocab size by 30%+",
+    "deliverable": "tokenizer.py with test suite showing BPE compression"
+  },
+  {
+    "id": "embeddings-and-dataloader",
+    "title": "Build Embeddings + Data Pipeline",
+    "description": "Implement embedding layers and training data loader following Manning Ch 2.6-2.8",
+    "timeEstimate": "3-4 hours",
+    "xp": 100,
+    "tier": "foundation",
+    "manningChapters": ["2.6", "2.7", "2.8"],
+    "manningVideos": [6, 7, 8],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=KA02GeM0pv4",
+      "https://www.youtube.com/watch?v=x2tYF_DHpgc",
+      "https://www.youtube.com/watch?v=EOU366BvhuA"
+    ],
+    "tasks": [
+      "Watch Manning videos 6-8 (44 min total)",
+      "Implement sliding window data sampler",
+      "Create PyTorch DataLoader with batching",
+      "Build token embedding layer (vocab_size → d_model)",
+      "Implement positional encoding",
+      "Combine token + position embeddings",
+      "Visualize embeddings with t-SNE"
+    ],
+    "winCondition": "DataLoader yields training batches, embeddings convert text to vectors with position info",
+    "deliverable": "data_loader.py + embeddings.py + visualization notebook"
+  },
+  {
+    "id": "self-attention-mechanism",
+    "title": "Implement Self-Attention from Scratch",
+    "description": "Build the core attention mechanism following Manning Ch 3.3-3.4",
+    "timeEstimate": "4-5 hours",
+    "xp": 150,
+    "tier": "intermediate",
+    "manningChapters": ["3.3.1", "3.4", "3.4.1", "3.4.2"],
+    "manningVideos": [9, 10, 11, 12],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=2rluVS_ap9M",
+      "https://www.youtube.com/watch?v=Dj1fjQNQl2g",
+      "https://www.youtube.com/watch?v=2-PYMkJ0OxY",
+      "https://www.youtube.com/watch?v=NcaoYngcF9E"
+    ],
+    "tasks": [
+      "Watch Manning videos 9-12 (81 min - core concept!)",
+      "Implement Q, K, V weight matrices",
+      "Calculate attention scores (Q @ K^T / √d_k)",
+      "Apply softmax to get attention weights",
+      "Compute weighted sum of values",
+      "Create SelfAttention PyTorch class",
+      "Visualize attention patterns on sample text"
+    ],
+    "winCondition": "Attention mechanism works, visualization shows which tokens attend to which",
+    "deliverable": "attention.py + attention_viz.html interactive visualization"
+  },
+  {
+    "id": "causal-attention-mask",
+    "title": "Add Causal Masking to Attention",
+    "description": "Implement masked attention for autoregressive generation following Manning Ch 3.5",
+    "timeEstimate": "2-3 hours",
+    "xp": 100,
+    "tier": "intermediate",
+    "manningChapters": ["3.5.1", "3.5.2", "3.5.3"],
+    "manningVideos": [13, 14, 15],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=-dk_Ewo1FGo",
+      "https://www.youtube.com/watch?v=DixrLzbWVtM",
+      "https://www.youtube.com/watch?v=v0rGOGe9N_I"
+    ],
+    "tasks": [
+      "Watch Manning videos 13-15 (26 min)",
+      "Create causal mask (upper triangular matrix)",
+      "Apply mask before softmax (set future → -inf)",
+      "Add dropout to attention weights (regularization)",
+      "Build CausalSelfAttention class",
+      "Test: verify token i cannot see tokens j > i",
+      "Compare masked vs unmasked attention heatmaps"
+    ],
+    "winCondition": "Model cannot peek at future tokens, attention visualization confirms masking",
+    "deliverable": "causal_attention.py with mask visualization comparison"
+  },
+  {
+    "id": "multi-head-attention",
+    "title": "Build Multi-Head Attention",
+    "description": "Implement parallel attention heads following Manning Ch 3.6",
+    "timeEstimate": "3-4 hours",
+    "xp": 125,
+    "tier": "intermediate",
+    "manningChapters": ["3.6.1", "3.6.2"],
+    "manningVideos": [16, 17],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=hzL0qlZq4Us",
+      "https://www.youtube.com/watch?v=zJyrNEpap90"
+    ],
+    "tasks": [
+      "Watch Manning videos 16-17 (29 min)",
+      "Split embeddings across multiple heads (e.g., 8 heads)",
+      "Run parallel attention computations per head",
+      "Concatenate head outputs",
+      "Add final output projection layer",
+      "Test with different head counts (4, 8, 12)",
+      "Visualize what different heads learn to attend to"
+    ],
+    "winCondition": "Multi-head attention works, different heads show different attention patterns",
+    "deliverable": "multi_head_attention.py + per-head analysis notebook"
+  },
+  {
+    "id": "layer-norm-and-ffn",
+    "title": "Build LayerNorm + FeedForward Network",
+    "description": "Implement transformer building blocks following Manning Ch 4.1-4.3",
+    "timeEstimate": "3-4 hours",
+    "xp": 125,
+    "tier": "advanced",
+    "manningChapters": ["4.1", "4.2", "4.3"],
+    "manningVideos": [18, 19, 20],
+    "videoLinks": [
+      "https://www.youtube.com/watch?v=8K1yCsO1CsU",
+      "https://www.youtube.com/watch?v=QKirqpM3bfk",
+      "https://www.youtube.com/watch?v=IMWbSrTfrC0"
+    ],
+    "tasks": [
+      "Watch Manning videos 18-20 (52 min)",
+      "Implement LayerNorm (normalize across embedding dimension)",
+      "Add learnable scale and bias parameters",
+      "Build 2-layer FFN: d_model → 4*d_model → d_model",
+      "Use GELU activation (not ReLU)",
+      "Add dropout for regularization",
+      "Test components individually before integration"
+    ],
+    "winCondition": "LayerNorm stabilizes activations, FFN increases model capacity",
+    "deliverable": "layer_norm.py + feed_forward.py with unit tests"
+  }
+]
