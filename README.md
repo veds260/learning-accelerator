@@ -62,6 +62,35 @@ Gamified skill tree:
 
 ---
 
+## 📺 Manning "Build an LLM from Scratch" Integration
+
+**This tool is now optimized for Sebastian Raschka's Manning video series!**
+
+✅ **14 Challenges** mapped directly to the 47-video playlist  
+✅ **50 Flashcards** covering all key concepts from the book  
+✅ **Complete content mapping** - know exactly which videos to watch for each challenge
+
+### Why This Integration Exists
+
+Watching 47 videos (13+ hours) is passive. This tool makes it **active learning**:
+- Each challenge = build something real from the videos
+- Flashcards = retain concepts long-term via spaced repetition
+- Progress tracking = stay motivated with XP/streaks
+- Gamification = make learning addictive
+
+### How to Use with Manning
+
+1. **Start with the playlist:** https://www.youtube.com/playlist?list=PLQRyiBCWmqp5twpd8Izmaxu5XRkxd5yC-
+2. **Pick a challenge** from the dashboard (they're in order)
+3. **Watch the mapped videos** (listed in each challenge)
+4. **Build the challenge** (code along, then build independently)
+5. **Review flashcards** daily (spaced repetition)
+6. **Mark complete** when you ship the deliverable
+
+**See [docs/manning-content-map.md](docs/manning-content-map.md) for detailed video-to-challenge mapping.**
+
+---
+
 ## Quick Start
 
 ### 1. Install dependencies
@@ -78,6 +107,12 @@ npm start
 ```
 http://localhost:3000
 ```
+
+### 4. Start with Foundation Tier
+Your first challenge: **Build Your Own Tokenizer**
+- Watch Manning Ch 2.2-2.5 (44 min)
+- Build a working tokenizer with BPE
+- Compare with OpenAI's tiktoken
 
 ---
 
@@ -311,6 +346,65 @@ Each challenge = foundation for a product.
 
 ---
 
+## 🎓 Manning Learning Path (11 Weeks)
+
+Follow this path to master the entire Manning series:
+
+### Weeks 1-2: Foundation (Tokenization & Embeddings)
+- Challenge 1: Build Your Own Tokenizer (Ch 2.2-2.5)
+- Challenge 2: Token + Position Embeddings (Ch 2.7-2.8)
+- Challenge 3: Training Data Pipeline (Ch 2.6)
+- **Flashcards:** Review 8 foundation cards daily
+
+### Weeks 3-4: Intermediate (Attention Mechanisms)
+- Challenge 4: Self-Attention from Scratch (Ch 3.3-3.4) ⭐ **CRITICAL**
+- Challenge 5: Causal Masking (Ch 3.5)
+- Challenge 6: Multi-Head Attention (Ch 3.6)
+- **Flashcards:** Review 9 intermediate cards daily
+
+### Weeks 5-6: Advanced (GPT Architecture)
+- Challenge 7: Transformer Block (Ch 4.1-4.5)
+- Challenge 8: Full GPT Model (Ch 4.6)
+- Challenge 9: Text Generation (Ch 4.7)
+- **Flashcards:** Review 10 advanced cards daily
+
+### Weeks 7-8: Expert (Training & Generation)
+- Challenge 10: Train GPT from Scratch (Ch 5.1-5.2)
+- Challenge 11: Sampling Strategies (Ch 5.3)
+- Challenge 12: Model I/O (Ch 5.4-5.5)
+- **Flashcards:** Review 13 expert cards daily
+
+### Weeks 9-11: Mastery (Fine-tuning)
+- Challenge 13: Classification Fine-tuning (Ch 6) - *5-6 hours*
+- Challenge 14: Instruction Fine-tuning (Ch 7) - *6-7 hours*
+- **Flashcards:** Review all 50 cards
+
+**Total Time Investment:**
+- Videos: ~14 hours (at 1x speed, recommend 1.5x)
+- Challenges: ~50 hours (hands-on building)
+- Flashcard reviews: ~30 min/day × 77 days = ~40 hours
+- **Grand Total: ~100 hours to master LLM implementation**
+
+---
+
+## 📊 Content Coverage
+
+The 14 challenges + 50 flashcards cover:
+
+| Topic | Challenges | Flashcards | Manning Chapters |
+|-------|-----------|-----------|------------------|
+| Tokenization | 1 | 4 | Ch 2.2-2.5 |
+| Embeddings | 1 | 3 | Ch 2.7-2.8 |
+| Data Preparation | 1 | 2 | Ch 2.6 |
+| Attention | 2 | 10 | Ch 3 |
+| Architecture | 2 | 8 | Ch 4.1-4.6 |
+| Generation | 1 | 4 | Ch 4.7, 5.3 |
+| Training | 2 | 8 | Ch 5.1-5.2 |
+| Model Management | 1 | 3 | Ch 5.4-5.5 |
+| Fine-tuning | 2 | 8 | Ch 6-7 |
+
+---
+
 ## Development
 
 ### Run in dev mode (auto-reload)
@@ -348,9 +442,98 @@ All progress stored in `/data`:
 
 ---
 
+## 🎯 Manning-Specific Features
+
+### 1. Content-Aware Challenges
+Each challenge includes:
+- **Exact video links** - know what to watch
+- **Watch time estimates** - plan your sessions
+- **Manning chapter references** - sync with the book
+- **Key concepts** - what you'll learn
+- **Deliverables** - clear success criteria
+
+### 2. Concept-Mapped Flashcards
+All 50 cards include:
+- **Manning chapter references** - trace back to source
+- **Tier classification** - know difficulty level
+- **Concept tags** - review by topic
+- **Spaced repetition** - SM-2 algorithm for retention
+
+### 3. Progress Tracking
+- **XP per challenge** (75-250 XP based on difficulty)
+- **Tier completion** (foundation → mastery)
+- **Streak tracking** (daily review = streak++)
+- **Milestones** (Bronze → Diamond)
+
+---
+
+## 💡 Learning Tips
+
+### For Maximum Retention
+1. **Watch at 1.5x** - Sebastian speaks clearly, save 30% time
+2. **Code along in real-time** - pause video, type yourself
+3. **Build before looking** - try implementing first, then watch
+4. **Review cards DAILY** - 10 min/day beats 2hr cramming
+5. **Teach back** - explain each concept in your own words
+6. **Ship products** - use challenges for real projects
+
+### For Speed
+- Foundation (3 challenges): 1-2 weeks
+- Intermediate (3 challenges): 2 weeks
+- Advanced (3 challenges): 2 weeks
+- Expert (3 challenges): 2 weeks
+- Mastery (2 challenges): 2-3 weeks
+
+**Fast track: 9-11 weeks to complete all challenges**
+
+### For Depth
+- Spend 2-3 days per challenge
+- Build variants and experiments
+- Read referenced papers
+- Compare implementations
+- Write blog posts
+
+**Deep track: 16-20 weeks with deep understanding**
+
+---
+
+## 📚 Manning Book + This Tool = Perfect Combo
+
+**Book:** [Build a Large Language Model (from Scratch)](https://www.manning.com/books/build-a-large-language-model-from-scratch) by Sebastian Raschka
+
+**Use this tool as:**
+- Active learning companion to the book
+- Progress tracker for the video series
+- Flashcard system for retention
+- Challenge framework for building
+
+**Book + Videos + This Tool = Complete LLM Education**
+
+---
+
+## 🔗 Related Resources
+
+- **Video Playlist:** https://www.youtube.com/playlist?list=PLQRyiBCWmqp5twpd8Izmaxu5XRkxd5yC-
+- **Sebastian's GitHub:** https://github.com/rasbt/LLMs-from-scratch
+- **Manning Book:** https://www.manning.com/books/build-a-large-language-model-from-scratch
+- **Content Map:** [docs/manning-content-map.md](docs/manning-content-map.md)
+- **Sebastian's Twitter:** [@rasbt](https://twitter.com/rasbt)
+
+---
+
 ## Remember
 
 **Your edge isn't what you know. It's what you can BUILD.**
+
+Everyone watches Manning videos. Few people BUILD what Sebastian teaches.
+
+This tool forces you to:
+1. **Build immediately** (challenge-based learning)
+2. **Retain long-term** (spaced repetition flashcards)
+3. **Track progress** (XP + streaks + milestones)
+4. **Ship products** (real deliverables, not toy examples)
+
+**Result: You ship LLM products while others are still watching tutorials.**
 
 Learn → Build → Ship → Repeat.
 
@@ -358,4 +541,5 @@ Daily.
 
 ---
 
-*Built by Zint for Ved, Feb 2026*
+*Built by Zint for Ved Singh, Feb 2026*  
+*Optimized for Sebastian Raschka's Manning "Build an LLM from Scratch" series*
