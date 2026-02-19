@@ -520,6 +520,68 @@ app.post('/api/quiz/review', async (req, res) => {
   }
 });
 
+// Quiz questions for lessons
+app.get('/api/quiz/:lessonId', async (req, res) => {
+  try {
+    console.log(`Loading quiz for lesson: ${req.params.lessonId}`);
+    
+    if (!fs.existsSync(QUIZ_QUESTIONS_FILE)) {
+      console.log('⚠️  Quiz questions file not found');
+      return res.json({ inLessonQuizzes: [], finalQuiz: null });
+    }
+    
+    const quizzes = readJSON(QUIZ_QUESTIONS_FILE);
+    const lessonQuiz = quizzes.find(q => q.lessonId === req.params.lessonId);
+    
+    if (!lessonQuiz) {
+      console.log(`⚠️  No quiz found for lesson ${req.params.lessonId}`);
+      return res.json({ inLessonQuizzes: [], finalQuiz: null });
+    }
+    
+    console.log(`✅ Quiz loaded for ${req.params.lessonId}`);
+    res.json(lessonQuiz);
+  } catch (error) {
+    console.error('❌ ERROR in /api/quiz/:lessonId:');
+    console.error('  Message:', error.message);
+    console.error('  Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to load quiz',
+      details: IS_PRODUCTION ? undefined : error.message
+    });
+  }
+});
+
+// Code exercises for lessons
+app.get('/api/code-exercises/:lessonId', async (req, res) => {
+  try {
+    console.log(`Loading code exercises for lesson: ${req.params.lessonId}`);
+    
+    if (!fs.existsSync(CODE_EXERCISES_FILE)) {
+      console.log('⚠️  Code exercises file not found');
+      return res.json({ exercises: [] });
+    }
+    
+    const exercises = readJSON(CODE_EXERCISES_FILE);
+    const lessonExercises = exercises.find(e => e.lessonId === req.params.lessonId);
+    
+    if (!lessonExercises) {
+      console.log(`⚠️  No exercises found for lesson ${req.params.lessonId}`);
+      return res.json({ exercises: [] });
+    }
+    
+    console.log(`✅ Code exercises loaded for ${req.params.lessonId}`);
+    res.json(lessonExercises);
+  } catch (error) {
+    console.error('❌ ERROR in /api/code-exercises/:lessonId:');
+    console.error('  Message:', error.message);
+    console.error('  Stack:', error.stack);
+    res.status(500).json({ 
+      error: 'Failed to load exercises',
+      details: IS_PRODUCTION ? undefined : error.message
+    });
+  }
+});
+
 // Progress
 app.get('/api/progress', async (req, res) => {
   try {
