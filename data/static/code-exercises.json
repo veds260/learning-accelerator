@@ -1,0 +1,46 @@
+[
+  {
+    "lessonId": "tokenization",
+    "exercises": [
+      {
+        "id": "tok-code-1",
+        "title": "Split Text by Spaces",
+        "instructions": "Complete the code to split text into word tokens. Replace ??? with the correct method name.",
+        "starterCode": "text = \"Hello world\"\ntokens = text.???()\nprint(tokens)",
+        "solution": "text = \"Hello world\"\ntokens = text.split()\nprint(tokens)",
+        "expectedOutput": "['Hello', 'world']",
+        "hints": [
+          "What Python method separates a string by spaces?",
+          "Try .split() - it splits strings into a list"
+        ],
+        "concept": "Basic word tokenization using Python's built-in split method"
+      },
+      {
+        "id": "tok-code-2",
+        "title": "Character Tokenization",
+        "instructions": "Convert text into individual character tokens. Replace ??? with the right function.",
+        "starterCode": "text = \"AI\"\ntokens = ???(text)\nprint(tokens)",
+        "solution": "text = \"AI\"\ntokens = list(text)\nprint(tokens)",
+        "expectedOutput": "['A', 'I']",
+        "hints": [
+          "Which Python function converts a string to a list of characters?",
+          "list(text) splits a string into individual characters"
+        ],
+        "concept": "Character-level tokenization - breaking text into its smallest units"
+      },
+      {
+        "id": "tok-code-3",
+        "title": "Count Tokens",
+        "instructions": "After tokenizing, count how many tokens you have. Complete the code.",
+        "starterCode": "text = \"Learn by doing\"\ntokens = text.split()\nnum_tokens = ???(tokens)\nprint(f\"Tokens: {num_tokens}\")",
+        "solution": "text = \"Learn by doing\"\ntokens = text.split()\nnum_tokens = len(tokens)\nprint(f\"Tokens: {num_tokens}\")",
+        "expectedOutput": "Tokens: 3",
+        "hints": [
+          "How do you count items in a Python list?",
+          "len() gives you the length of a list"
+        ],
+        "concept": "Understanding token count - crucial for knowing model input size"
+      }
+    ]
+  }
+]

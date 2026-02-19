@@ -1,0 +1,122 @@
+[
+  {
+    "lessonId": "tokenization",
+    "inLessonQuizzes": [
+      {
+        "afterSection": "concept",
+        "title": "Quick Check: Core Concept",
+        "questions": [
+          {
+            "id": "tok-q1",
+            "question": "What is tokenization?",
+            "options": [
+              "Breaking text into smaller pieces (tokens)",
+              "Converting text to uppercase",
+              "Translating text to another language",
+              "Compressing text to save space"
+            ],
+            "correct": 0,
+            "explanation": "Tokenization is the process of breaking text into smaller units called tokens. These could be words, characters, or subwords depending on the method used."
+          },
+          {
+            "id": "tok-q2",
+            "question": "Why do AI models need tokenization?",
+            "options": [
+              "To make text look pretty",
+              "Because models can only process numbers, not raw text",
+              "To reduce file size",
+              "To encrypt the data"
+            ],
+            "correct": 1,
+            "explanation": "AI models work with numbers, not text. Tokenization converts text into numbers (token IDs) that the model can process."
+          }
+        ]
+      },
+      {
+        "afterSection": "analogy",
+        "title": "Quick Check: Understanding",
+        "questions": [
+          {
+            "id": "tok-q3",
+            "question": "Tokenization is like...",
+            "options": [
+              "Breaking LEGO structures into individual blocks",
+              "Painting a picture",
+              "Writing a book",
+              "Solving a math problem"
+            ],
+            "correct": 0,
+            "explanation": "Just like breaking down LEGO structures into reusable blocks, tokenization breaks text into reusable pieces that can be recombined and understood."
+          }
+        ]
+      }
+    ],
+    "finalQuiz": {
+      "title": "Tokenization Mastery Quiz",
+      "passingScore": 80,
+      "questions": [
+        {
+          "id": "tok-final-1",
+          "question": "What happens if you tokenize text inconsistently?",
+          "options": [
+            "The AI gets confused and produces wrong results",
+            "Nothing, it works fine",
+            "The text gets deleted",
+            "It runs faster"
+          ],
+          "correct": 0,
+          "explanation": "Consistency is critical! If you tokenize 'Hello' as ['H','e','l','l','o'] during training but ['Hello'] during inference, the model won't understand."
+        },
+        {
+          "id": "tok-final-2",
+          "question": "Which is a token from the text 'Hello, world!'?",
+          "options": [
+            "'Hello,'",
+            "All of these could be tokens",
+            "'world'",
+            "','",
+            "'!'"
+          ],
+          "correct": 1,
+          "explanation": "Depending on your tokenization strategy, any of these could be valid tokens. Word-level might give ['Hello', ',', 'world', '!'], character-level gives ['H','e','l',...], etc."
+        },
+        {
+          "id": "tok-final-3",
+          "question": "Why can't we just use words as tokens?",
+          "options": [
+            "It works fine for all cases",
+            "Too many unique words exist (infinite vocabulary problem)",
+              "Words are too long",
+              "It's illegal"
+          ],
+          "correct": 1,
+          "explanation": "English alone has hundreds of thousands of words, and new words are created constantly. A fixed vocabulary of word tokens would miss many words and be too large to manage."
+        },
+        {
+          "id": "tok-final-4",
+          "question": "What do token IDs represent?",
+          "options": [
+            "Random numbers assigned to tokens",
+            "Unique numbers that let the model look up tokens",
+            "The length of each token",
+            "The importance of each word"
+          ],
+          "correct": 1,
+          "explanation": "Token IDs are like index numbers in a dictionary. The model uses them to look up embeddings (meaning representations) for each token."
+        },
+        {
+          "id": "tok-final-5",
+          "question": "True or False: GPT and ChatGPT use the same tokenization method.",
+          "options": [
+            "True - they use the same tokenizer",
+            "False - each model has different tokenization",
+            "Only on Tuesdays",
+            "It depends on the moon phase"
+          ],
+          "correct": 0,
+          "explanation": "True! GPT models (including ChatGPT) use the same BPE (Byte Pair Encoding) tokenizer. This ensures consistency across the model family."
+        }
+      ]
+    }
+  }
+]

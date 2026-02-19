@@ -1,0 +1,182 @@
+[
+  {
+    "index": 1,
+    "videoId": "2U3JLwKdbmQ",
+    "title": "Live Coding with Sebastian Raschka: Python Environment Setup for Building LLMs",
+    "chapter": "Setup",
+    "topics": ["Python environment", "Jupyter notebooks", "Dependencies", "Setup"],
+    "difficulty": "beginner",
+    "url": "https://www.youtube.com/watch?v=2U3JLwKdbmQ"
+  },
+  {
+    "index": 2,
+    "videoId": "2U3JLwKdbmQ",
+    "title": "Tokenizing Text - Live Coding with Sebastian Raschka (Chapter 2.2)",
+    "chapter": "2.2",
+    "topics": ["Tokenization", "Text preprocessing", "NLP fundamentals"],
+    "difficulty": "beginner",
+    "url": "https://www.youtube.com/watch?v=2U3JLwKdbmQ"
+  },
+  {
+    "index": 3,
+    "videoId": "2U3JLwKdbmQ",
+    "title": "Convert Tokens into Token IDs - Live Coding with Sebastian Raschka (Chapter 2.3)",
+    "chapter": "2.3",
+    "topics": ["Token IDs", "Vocabulary", "Encoding"],
+    "difficulty": "beginner",
+    "url": "https://www.youtube.com/watch?v=2U3JLwKdbmQ"
+  },
+  {
+    "index": 4,
+    "videoId": "2U3JLwKdbmQ",
+    "title": "Adding Special Context Tokens - Live Coding with Sebastian Raschka (Chapter 2.4)",
+    "chapter": "2.4",
+    "topics": ["Special tokens", "BOS", "EOS", "UNK tokens"],
+    "difficulty": "beginner",
+    "url": "https://www.youtube.com/watch?v=2U3JLwKdbmQ"
+  },
+  {
+    "index": 5,
+    "videoId": "Iu5wqyddPco",
+    "title": "Byte Pair Encoding (BPE) – Live Coding with Sebastian Raschka (Chapter 2.5)",
+    "chapter": "2.5",
+    "topics": ["BPE", "Subword tokenization", "Advanced tokenization"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=Iu5wqyddPco"
+  },
+  {
+    "index": 6,
+    "videoId": "Iu5wqyddPco",
+    "title": "Data Sampling with a Sliding Window – Live Coding with Sebastian Raschka (Chapter 2.6)",
+    "chapter": "2.6",
+    "topics": ["Data sampling", "Sliding window", "Training data preparation"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=Iu5wqyddPco"
+  },
+  {
+    "index": 7,
+    "videoId": "Iu5wqyddPco",
+    "title": "Creating Token Embeddings – Live Coding with Sebastian Raschka (Chapter 2.7)",
+    "chapter": "2.7",
+    "topics": ["Embeddings", "Vector representations", "Embedding layers"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=Iu5wqyddPco"
+  },
+  {
+    "index": 8,
+    "videoId": "Iu5wqyddPco",
+    "title": "Encoding Word Positions – Live Coding with Sebastian Raschka (Chapter 2.8)",
+    "chapter": "2.8",
+    "topics": ["Positional encoding", "Position embeddings", "Sequence order"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=Iu5wqyddPco"
+  },
+  {
+    "index": 9,
+    "videoId": "5uEwiN_9hJk",
+    "title": "A Simple Self-Attention Mechanism – Live Coding w/ Sebastian Raschka (3.3.1.)",
+    "chapter": "3.3.1",
+    "topics": ["Self-attention", "Attention mechanism", "Query-key-value"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=5uEwiN_9hJk"
+  },
+  {
+    "index": 10,
+    "videoId": "5uEwiN_9hJk",
+    "title": "Computing Attention Weights – Live Coding with Sebastian Raschka (Transformer Mechanics Explained)",
+    "chapter": "3.3",
+    "topics": ["Attention weights", "Softmax", "Attention scores"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=5uEwiN_9hJk"
+  },
+  {
+    "index": 11,
+    "videoId": "5uEwiN_9hJk",
+    "title": "Step-by-Step Guide to Computing Attention Weights – Live Coding w/ Sebastian Raschka (Ch. 3.4.1)",
+    "chapter": "3.4.1",
+    "topics": ["Attention computation", "Matrix operations", "Step-by-step implementation"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=5uEwiN_9hJk"
+  },
+  {
+    "index": 12,
+    "videoId": "5uEwiN_9hJk",
+    "title": "Implementing a Compact Self-Attention Class – Live Coding with Sebastian Raschka (Chapter 3.4.2)",
+    "chapter": "3.4.2",
+    "topics": ["Self-attention class", "OOP", "Code organization"],
+    "difficulty": "intermediate",
+    "url": "https://www.youtube.com/watch?v=5uEwiN_9hJk"
+  },
+  {
+    "index": 13,
+    "videoId": "jA7kx6cTKVE",
+    "title": "Applying a Causal Attention Mask – Live Coding with Sebastian Raschka (Chapter 3.5.1)",
+    "chapter": "3.5.1",
+    "topics": ["Causal masking", "Autoregressive models", "Masked attention"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=jA7kx6cTKVE"
+  },
+  {
+    "index": 14,
+    "videoId": "jA7kx6cTKVE",
+    "title": "Masking Additional Attention Weights with Dropout – Live Coding w/ Sebastian Raschka (Ch. 3.5.2)",
+    "chapter": "3.5.2",
+    "topics": ["Dropout", "Regularization", "Attention dropout"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=jA7kx6cTKVE"
+  },
+  {
+    "index": 15,
+    "videoId": "jA7kx6cTKVE",
+    "title": "Implementing a Compact Causal Self-Attention Class – Live Coding w/ Sebastian Raschka (Ch. 3.5.3)",
+    "chapter": "3.5.3",
+    "topics": ["Causal self-attention", "Complete implementation", "Class design"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=jA7kx6cTKVE"
+  },
+  {
+    "index": 16,
+    "videoId": "jA7kx6cTKVE",
+    "title": "Stacking Multiple Single-Head Attention Layers – Live Coding w Sebastian Raschka (Ch. 3.6.1)",
+    "chapter": "3.6.1",
+    "topics": ["Layer stacking", "Deep networks", "Attention layers"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=jA7kx6cTKVE"
+  },
+  {
+    "index": 17,
+    "videoId": "ePfY7P0iNik",
+    "title": "Multi-Head Attention with Weight Splits – Live Coding with Sebastian Raschka (Chapter 3.6.2)",
+    "chapter": "3.6.2",
+    "topics": ["Multi-head attention", "Parallel attention", "Weight splitting"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=ePfY7P0iNik"
+  },
+  {
+    "index": 18,
+    "videoId": "ePfY7P0iNik",
+    "title": "Coding an LLM Architecture – Live Coding with Sebastian Raschka (Chapter 4.1)",
+    "chapter": "4.1",
+    "topics": ["LLM architecture", "GPT architecture", "Model design"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=ePfY7P0iNik"
+  },
+  {
+    "index": 19,
+    "videoId": "ePfY7P0iNik",
+    "title": "Layer Normalization in Transformers – Live Coding with Sebastian Raschka (Chapter 4.2)",
+    "chapter": "4.2",
+    "topics": ["Layer normalization", "Normalization techniques", "Training stability"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=ePfY7P0iNik"
+  },
+  {
+    "index": 20,
+    "videoId": "ePfY7P0iNik",
+    "title": "Implementing a feed forward network with GELU – Live Coding with Sebastian Raschka (Chapter 4.3)",
+    "chapter": "4.3",
+    "topics": ["Feed-forward networks", "GELU activation", "MLP layers"],
+    "difficulty": "advanced",
+    "url": "https://www.youtube.com/watch?v=ePfY7P0iNik"
+  }
+]

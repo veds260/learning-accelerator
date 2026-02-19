@@ -1,0 +1,258 @@
+[
+  {
+    "id": "tokenization",
+    "level": 1,
+    "title": "The Language Puzzle",
+    "subtitle": "Breaking Words Into Pieces",
+    "emoji": "🧩",
+    "story": "You're a translator for an alien species called the Numerians. They don't understand words—they only understand numbers. Your job? Break human language into consistent pieces (tokens) and give each piece a unique number. But here's the catch: you need to do it the EXACT same way every time, or the Numerians get confused and their spaceship crashes. Welcome to tokenization—the foundation of how every AI model reads text.",
+    "hook": "Imagine trying to explain a book to someone who's never seen letters before. That's what your AI faces every day.",
+    "concept": "Tokenization is the process of breaking text into smaller units called tokens. Think of it like cutting a pizza into slices—you need consistent cuts so everyone knows what they're getting. For AI models, tokens are the building blocks of understanding. Before an AI can read 'Hello, world!', it needs to break it into pieces like ['Hello', ',', ' ', 'world', '!'] and convert each piece to a number.",
+    "analogy": "**The LEGO Analogy:**\n\nImagine text as one long LEGO structure. To ship it somewhere, you need to break it into individual bricks. Each brick type gets a number:\n\n🟥 Red brick = 42\n🟦 Blue brick = 17\n🟨 Yellow brick = 8\n\nNow you can send \"42 42 17 8\" instead of the whole structure. The receiver rebuilds it using the same numbering system. That's tokenization!\n\n**Why it matters:** Different ways of breaking the structure give different results. Break too small (individual dots) = too many pieces. Break too big (whole walls) = not flexible enough.",
+    "visual": "TEXT INPUT:\n\"Hello, world!\"\n        ↓\n   TOKENIZER\n        ↓\n   TOKEN LIST:\n['Hello', ',', ' ', 'world', '!']\n        ↓\n    TOKEN IDs:\n[15496, 11, 220, 14957, 0]\n        ↓\nAI MODEL 🤖",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Your First Tokenizer",
+        "description": "Let's build a simple tokenizer that splits on spaces and punctuation:",
+        "code": "import re\n\ndef simple_tokenizer(text):\n    # Split on whitespace and keep punctuation separate\n    tokens = re.findall(r\"\\b\\w+\\b|[.,!?;]\", text)\n    return tokens\n\n# Try it!\ntext = \"Hello, world! How are you?\"\ntokens = simple_tokenizer(text)\nprint(f\"Tokens: {tokens}\")\nprint(f\"Token count: {len(tokens)}\")\n\n# Output:\n# Tokens: ['Hello', ',', 'world', '!', 'How', 'are', 'you', '?']\n# Token count: 8",
+        "explanation": "This tokenizer uses regex to find word boundaries (\\b\\w+\\b) and punctuation. Notice how 'Hello,' becomes TWO tokens: 'Hello' and ','. This is intentional—punctuation carries meaning!"
+      },
+      {
+        "type": "code",
+        "title": "Building a Vocabulary",
+        "description": "Now let's assign numbers to each unique token:",
+        "code": "def build_vocab(texts):\n    vocab = {}  # token -> ID mapping\n    idx = 0\n    \n    for text in texts:\n        tokens = simple_tokenizer(text)\n        for token in tokens:\n            if token not in vocab:\n                vocab[token] = idx\n                idx += 1\n    \n    return vocab\n\n# Try it!\ncorpus = [\n    \"Hello, world!\",\n    \"Hello, AI!\",\n    \"Welcome to the world of AI.\"\n]\n\nvocab = build_vocab(corpus)\nprint(\"Vocabulary:\", vocab)\n\n# Output:\n# Vocabulary: {\n#   'Hello': 0, ',': 1, 'world': 2, '!': 3,\n#   'AI': 4, 'Welcome': 5, 'to': 6, 'the': 7,\n#   'of': 8, '.': 9\n# }",
+        "explanation": "Each unique token gets a unique ID. Now 'Hello, world!' becomes [0, 1, 2, 3]. This is how AI models see your text—as sequences of numbers!"
+      },
+      {
+        "type": "exercise",
+        "title": "Quick Check",
+        "question": "What would the token IDs be for 'Welcome to AI.' using our vocab?",
+        "answer": "[5, 6, 4, 9]",
+        "hint": "Look up each token in the vocabulary dictionary above"
+      }
+    ],
+    "keyPoints": [
+      "Tokenization breaks text into consistent, reusable pieces",
+      "Each unique token gets a unique ID number",
+      "Punctuation matters—it's often a separate token",
+      "The vocabulary is built from your training data",
+      "Same text ALWAYS produces same tokens (deterministic)"
+    ],
+    "realWorld": [
+      "**ChatGPT:** Uses ~50,000 tokens in its vocabulary to handle all of English (and code!)",
+      "**Why it matters:** Token count = cost. APIs charge per token, so efficient tokenization saves money",
+      "**Common gotcha:** 'ChatGPT' might be ONE token, but 'Chat GPT' is TWO. Spacing changes meaning!",
+      "**Multilingual models:** Different languages need different tokenization strategies (Chinese has no spaces!)"
+    ],
+    "challenge": {
+      "unlocks": "tokenizer-from-scratch",
+      "preview": "Ready to build a REAL tokenizer? Your challenge: implement a tokenizer that handles special cases like contractions (don't → do + n't), numbers, and unknown words. You'll test it against GPT's tokenizer to see how close you get!",
+      "xp": 100
+    },
+    "easterEgg": "Did you know? GPT-3's tokenizer treats ' world' (with leading space) as a DIFFERENT token than 'world'. That leading space tells the model this is a new word, not a prefix!"
+  },
+  {
+    "id": "special-tokens",
+    "level": 2,
+    "title": "The Secret Signals",
+    "subtitle": "Teaching AI to Understand Context",
+    "emoji": "🎯",
+    "story": "The Numerians are happy with your basic translator, but they have a problem: they can't tell when a message ends, or when they've encountered a word they've never seen. It's like reading a book with no periods and random symbols. You need to add 'traffic signals' to the text—special tokens that tell the AI 'STOP HERE' or 'UNKNOWN WORD AHEAD.' These aren't real words; they're control codes. Think of them as the punctuation marks of the AI world.",
+    "hook": "What happens when your AI encounters a word that didn't exist when it was trained? Enter: special tokens.",
+    "concept": "Special tokens are reserved tokens that don't appear in normal text but carry important meaning for the model. Common ones:\n\n• **<|endoftext|>** - marks the end of a document\n• **<|unk|>** (unknown) - replaces words not in vocabulary  \n• **<|pad|>** - pads sequences to same length for batching\n• **<|bos|>** (beginning of sequence) - marks start\n• **<|eos|>** (end of sequence) - marks end\n\nThese tokens get their own IDs (usually at the start of vocab, like ID 0-10) and are never split further.",
+    "analogy": "**The Traffic Light Analogy:**\n\nImagine driving through a city:\n\n🔴 **STOP sign** = <|endoftext|> (document boundary)\n🟡 **YIELD sign** = <|unk|> (proceed with caution, unknown word)\n🟢 **GO sign** = <|bos|> (start of journey)\n🚧 **CONSTRUCTION** = <|pad|> (filler, ignore this)\n\nThese aren't roads—they're signals that tell you how to navigate. Same with special tokens!",
+    "visual": "NORMAL TEXT:\n\"I love AI!\"\n\nWITH SPECIAL TOKENS:\n<|bos|> I love AI ! <|endoftext|>\n\nWITH UNKNOWN WORD:\n\"I love zxyqw\"  →  <|bos|> I love <|unk|> <|endoftext|>\n                         (zxyqw not in vocab!)\n\nBATCHING (needs same length):\nText 1: <|bos|> Hello <|eos|> <|pad|> <|pad|>\nText 2: <|bos|> Hi there <|eos|> <|pad|>\nText 3: <|bos|> Hey world <|eos|> <|pad|>",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Adding Special Tokens to Your Vocabulary",
+        "description": "Let's extend our tokenizer with special tokens:",
+        "code": "class TokenizerWithSpecials:\n    def __init__(self):\n        # Reserve first IDs for special tokens\n        self.special_tokens = {\n            '<|unk|>': 0,      # Unknown word\n            '<|endoftext|>': 1, # End of document\n            '<|bos|>': 2,      # Beginning of sequence\n            '<|eos|>': 3,      # End of sequence\n            '<|pad|>': 4       # Padding\n        }\n        self.vocab = {**self.special_tokens}  # Start with specials\n        self.next_id = len(self.special_tokens)\n    \n    def add_token(self, token):\n        if token not in self.vocab:\n            self.vocab[token] = self.next_id\n            self.next_id += 1\n        return self.vocab[token]\n    \n    def encode(self, text, add_special=True):\n        tokens = simple_tokenizer(text)\n        ids = []\n        \n        if add_special:\n            ids.append(self.vocab['<|bos|>'])  # Start marker\n        \n        for token in tokens:\n            if token in self.vocab:\n                ids.append(self.vocab[token])\n            else:\n                ids.append(self.vocab['<|unk|>'])  # Unknown!\n        \n        if add_special:\n            ids.append(self.vocab['<|eos|>'])  # End marker\n        \n        return ids\n\n# Try it!\ntokenizer = TokenizerWithSpecials()\ntokenizer.add_token('Hello')\ntokenizer.add_token('world')\n\nids = tokenizer.encode(\"Hello world\")\nprint(f\"Token IDs: {ids}\")\n# Output: [2, 5, 6, 3]  (bos, Hello, world, eos)\n\nids_unknown = tokenizer.encode(\"Hello zxyqw\")\nprint(f\"With unknown: {ids_unknown}\")\n# Output: [2, 5, 0, 3]  (bos, Hello, <unk>, eos)",
+        "explanation": "Notice how 'zxyqw' becomes ID 0 (<|unk|>)! This prevents crashes when encountering new words. The model learns to handle <|unk|> gracefully."
+      },
+      {
+        "type": "code",
+        "title": "Padding for Batching",
+        "description": "When training, we need same-length sequences. Pad shorter ones:",
+        "code": "def pad_sequences(sequences, max_length, pad_id):\n    padded = []\n    for seq in sequences:\n        if len(seq) < max_length:\n            # Add padding tokens to end\n            seq = seq + [pad_id] * (max_length - len(seq))\n        else:\n            # Truncate if too long\n            seq = seq[:max_length]\n        padded.append(seq)\n    return padded\n\n# Try it!\nsequences = [\n    [2, 5, 6, 3],         # \"Hello world\"\n    [2, 7, 3],            # \"Hi\"\n    [2, 8, 9, 10, 3]      # \"How are you\"\n]\n\npadded = pad_sequences(sequences, max_length=6, pad_id=4)\nfor seq in padded:\n    print(seq)\n\n# Output:\n# [2, 5, 6, 3, 4, 4]    (padded with 2x <pad>)\n# [2, 7, 3, 4, 4, 4]    (padded with 3x <pad>)\n# [2, 8, 9, 10, 3, 4]   (padded with 1x <pad>)",
+        "explanation": "Padding lets us batch different-length texts together. The model learns to ignore <|pad|> tokens during training."
+      }
+    ],
+    "keyPoints": [
+      "Special tokens are control signals, not real words",
+      "<|unk|> handles out-of-vocabulary words gracefully",
+      "<|endoftext|> tells model where documents end (critical for training)",
+      "<|pad|> enables batching of different-length sequences",
+      "Special tokens ALWAYS get reserved IDs (usually 0-10)"
+    ],
+    "realWorld": [
+      "**GPT-3:** Uses <|endoftext|> to prevent mixing documents (imagine blog post bleeding into code!)",
+      "**BERT:** Uses [CLS] token for classification tasks, [SEP] to separate sentences",
+      "**Why UNK matters:** New words appear all the time (TikTok, COVID-19). <|unk|> prevents crashes",
+      "**Token limits:** ChatGPT's 4K context = 4,000 tokens (including specials!). Plan your prompts accordingly."
+    ],
+    "challenge": {
+      "unlocks": "tokenizer-from-scratch",
+      "preview": "In your build challenge, you'll implement a full tokenizer with special token handling, unknown word detection, and padding logic. You'll see how production tokenizers handle these edge cases!",
+      "xp": 100
+    },
+    "easterEgg": "Fun fact: GPT-2's <|endoftext|> token (ID 50256) was leaked in early demos, and people started using it in prompts to 'confuse' the model. OpenAI now filters it from inputs!"
+  },
+  {
+    "id": "byte-pair-encoding",
+    "level": 3,
+    "title": "The Merge Wizard",
+    "subtitle": "Smart Compression Through Pattern Learning",
+    "emoji": "🔀",
+    "story": "The Numerians love your tokenizer, but they've hit a problem: their vocabulary is HUGE. Every unique word needs its own ID, which means millions of numbers to store. Their data storage is overloading! You need a smarter approach: what if instead of storing every word, you store common letter patterns and merge them together? 'th' + 'e' = 'the'. 'un' + 'happy' = 'unhappy'. This is Byte Pair Encoding—the compression algorithm that makes modern AI possible.",
+    "hook": "How do you store infinite words with a finite vocabulary? You don't store words—you store patterns.",
+    "concept": "Byte Pair Encoding (BPE) is a compression algorithm that builds a vocabulary by iteratively merging the most frequent pairs of tokens. Instead of having separate tokens for 'low', 'lower', 'lowest', you have:\n\n• Base: 'l', 'o', 'w', 'e', 'r', 's', 't'\n• Merge: 'lo', 'low', 'er', 'est'\n• Result: 'low' + 'est' = 'lowest'\n\nThis dramatically reduces vocabulary size while handling new words. If you see 'lower', you can build it from 'low' + 'er' even if you've never seen it before!",
+    "analogy": "**The Abbreviation Factory:**\n\nImagine you're texting and want to save characters:\n\nDay 1: \"laugh out loud\" (14 chars)\nDay 2: Notice you type \"laugh out\" often → abbreviate to \"lol\"\nDay 3: Notice \"be right back\" → abbreviate to \"brb\"\nDay 4: Now \"lol brb\" = 7 chars instead of 28!\n\nBPE does this automatically by finding the most common pairs and merging them into new tokens. The more you merge, the more efficient your vocabulary becomes.",
+    "visual": "STEP-BY-STEP BPE:\n\nInput text: \"low low low lower lowest\"\n\n1. START (character level):\n   l o w _ l o w _ l o w _ l o w e r _ l o w e s t\n\n2. Most common pair: 'l' + 'o' → merge to 'lo'\n   lo w _ lo w _ lo w _ lo w e r _ lo w e s t\n\n3. Next common: 'lo' + 'w' → merge to 'low'\n   low _ low _ low _ low e r _ low e s t\n\n4. Next: 'e' + 'r' → merge to 'er'\n   low _ low _ low _ low er _ low e s t\n\n5. Next: 'e' + 's' → merge to 'es'\n   low _ low _ low _ low er _ low es t\n\nFINAL VOCABULARY:\n['l', 'o', 'w', 'e', 'r', 's', 't', 'lo', 'low', 'er', 'es']\n\nTokens for \"lowest\": ['low', 'es', 't'] (3 tokens instead of 6 characters!)",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Simple BPE Implementation",
+        "description": "Let's build a basic BPE algorithm:",
+        "code": "from collections import Counter\nimport re\n\ndef get_pairs(word):\n    \"\"\"Get all adjacent pairs in a word\"\"\"\n    pairs = []\n    prev = word[0]\n    for char in word[1:]:\n        pairs.append((prev, char))\n        prev = char\n    return pairs\n\ndef merge_pair(word, pair, new_token):\n    \"\"\"Merge a pair into a new token\"\"\"\n    result = []\n    i = 0\n    while i < len(word):\n        if i < len(word) - 1 and (word[i], word[i+1]) == pair:\n            result.append(new_token)\n            i += 2\n        else:\n            result.append(word[i])\n            i += 1\n    return result\n\n# Try it!\nword = ['l', 'o', 'w', 'e', 'r']\nprint(f\"Original: {word}\")\nprint(f\"Pairs: {get_pairs(word)}\")\n\n# Merge 'l' + 'o' → 'lo'\nmerged = merge_pair(word, ('l', 'o'), 'lo')\nprint(f\"After merging 'l'+'o': {merged}\")\n\n# Output:\n# Original: ['l', 'o', 'w', 'e', 'r']\n# Pairs: [('l', 'o'), ('o', 'w'), ('w', 'e'), ('e', 'r')]\n# After merging 'l'+'o': ['lo', 'w', 'e', 'r']",
+        "explanation": "BPE works by finding the most common pair, merging it, then repeating. Each merge creates a new token in your vocabulary."
+      },
+      {
+        "type": "code",
+        "title": "Full BPE Training",
+        "description": "Now let's train BPE on real text:",
+        "code": "def train_bpe(text, num_merges):\n    # Start with character-level tokens\n    words = text.split()\n    vocab = {word: list(word) for word in set(words)}\n    \n    merges = []  # Track merge history\n    \n    for i in range(num_merges):\n        # Count all pairs across all words\n        pair_counts = Counter()\n        for word_tokens in vocab.values():\n            pairs = get_pairs(word_tokens)\n            pair_counts.update(pairs)\n        \n        if not pair_counts:\n            break\n        \n        # Find most common pair\n        best_pair = pair_counts.most_common(1)[0][0]\n        new_token = ''.join(best_pair)\n        \n        # Merge this pair everywhere\n        for word in vocab:\n            vocab[word] = merge_pair(vocab[word], best_pair, new_token)\n        \n        merges.append((best_pair, new_token))\n        print(f\"Merge {i+1}: {best_pair} → '{new_token}'\")\n    \n    return vocab, merges\n\n# Try it!\ntext = \"low low low lower lowest\"\nvocab, merges = train_bpe(text, num_merges=3)\n\nprint(\"\\nFinal vocabulary:\")\nfor word, tokens in vocab.items():\n    print(f\"{word}: {tokens}\")\n\n# Output:\n# Merge 1: ('l', 'o') → 'lo'\n# Merge 2: ('lo', 'w') → 'low'\n# Merge 3: ('e', 'r') → 'er'\n#\n# Final vocabulary:\n# low: ['low']\n# lower: ['low', 'er']\n# lowest: ['low', 'e', 's', 't']",
+        "explanation": "Notice how 'lowest' is now 4 tokens instead of 6 characters! BPE learns common subword patterns automatically."
+      }
+    ],
+    "keyPoints": [
+      "BPE builds vocabulary by merging frequent character pairs",
+      "Handles unknown words by breaking into known subwords",
+      "Dramatically reduces vocabulary size (GPT uses ~50K tokens for all English!)",
+      "Character-level fallback: any word can be represented",
+      "Trade-off: more merges = smaller vocab but longer sequences"
+    ],
+    "realWorld": [
+      "**GPT-3:** Uses 50,257 BPE tokens (vs millions of English words!)",
+      "**Why it works:** 'unhappiness' = 'un' + 'happi' + 'ness' (3 tokens, reusable parts)",
+      "**Multilingual:** Same BPE vocab handles English, code, and even emojis",
+      "**Cost saver:** Fewer tokens = lower API costs. 'ChatGPT' is 1 token, not 7 letters!"
+    ],
+    "challenge": {
+      "unlocks": "tokenizer-from-scratch",
+      "preview": "Your challenge: implement full BPE from scratch, train it on real text, and compare compression ratios with GPT's tiktoken. Can you beat 30% reduction?",
+      "xp": 100
+    },
+    "easterEgg": "Weird BPE fact: Because BPE learns from data, it has biases. GPT-3's tokenizer treats ' black' and ' white' as single tokens but ' Asian' as two tokens. This affects model behavior!"
+  },
+  {
+    "id": "data-sampling",
+    "level": 4,
+    "title": "The Training Dojo",
+    "subtitle": "Feeding Your AI Efficiently",
+    "emoji": "📊",
+    "story": "The Numerians are ready to learn from human text, but they have a problem: they can only focus on small chunks at a time (like reading a book through a tiny window). You can't just throw random sentences at them—they need context. The solution? Sliding windows. You move the window across your text, giving them overlapping chunks so they can learn how words flow together. This is data sampling—the art of feeding AI the right bite-sized pieces.",
+    "hook": "An AI doesn't read books cover-to-cover. It reads thousands of tiny overlapping windows simultaneously.",
+    "concept": "Data sampling for language models involves creating training examples from raw text using sliding windows:\n\n1. **Sliding Window:** Move a fixed-size window across text, creating overlapping sequences\n2. **Stride:** How far to move the window each time (stride=1 means max overlap)\n3. **Batching:** Group multiple sequences together for parallel training\n4. **Shuffling:** Randomize order to prevent overfitting to document order\n\nExample with window_size=4, stride=2:\nText: \"The cat sat on the mat\"\nWindows: [\"The cat sat on\", \"sat on the mat\"]",
+    "analogy": "**The Movie Scene Analogy:**\n\nImagine training an AI to understand movies by showing it 10-second clips:\n\n🎬 **Scene 1:** [0:00-0:10] - Opening credits\n🎬 **Scene 2:** [0:05-0:15] - Credits + first dialogue (overlap!)\n🎬 **Scene 3:** [0:10-0:20] - Dialogue continues\n\nOverlap is crucial! If you showed [0:00-0:10] then [0:20-0:30], the AI would miss the connection. Sliding windows create smooth learning.\n\n**Batch processing:** Instead of watching one clip at a time, watch 32 clips simultaneously (different movies). Way faster!",
+    "visual": "SLIDING WINDOW EXAMPLE:\n\nText: \"I love building AI models\"\nTokens: [I, love, building, AI, models]\n\nWindow size: 3, Stride: 1\n\nWindow 1: [I, love, building]        → Input: [I, love]      Target: [building]\nWindow 2: [love, building, AI]      → Input: [love, building] Target: [AI]\nWindow 3: [building, AI, models]    → Input: [building, AI]   Target: [models]\n\nEach window = one training example!\nThe model learns to predict the NEXT token given previous tokens.\n\nBATCHING:\nBatch of 3 examples (from different texts):\n┌─────────────────────┐\n│ [I, love] → building │\n│ [cat, sat] → on     │\n│ [AI, is] → amazing  │\n└─────────────────────┘\nAll processed in parallel on GPU!",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Building a Sliding Window Sampler",
+        "description": "Let's create a data sampler with sliding windows:",
+        "code": "def create_sliding_windows(tokens, window_size, stride):\n    windows = []\n    \n    for i in range(0, len(tokens) - window_size + 1, stride):\n        window = tokens[i:i + window_size]\n        windows.append(window)\n    \n    return windows\n\n# Try it!\ntokens = [\"I\", \"love\", \"building\", \"AI\", \"models\", \"every\", \"day\"]\nwindows = create_sliding_windows(tokens, window_size=4, stride=2)\n\nfor i, window in enumerate(windows):\n    print(f\"Window {i+1}: {window}\")\n\n# Output:\n# Window 1: ['I', 'love', 'building', 'AI']\n# Window 2: ['building', 'AI', 'models', 'every']\n# Window 3: ['models', 'every', 'day']\n\nprint(f\"\\nTotal windows: {len(windows)}\")\nprint(f\"From {len(tokens)} tokens → {len(windows)} training examples!\")",
+        "explanation": "Stride=2 means we move 2 tokens at a time. Smaller stride = more overlap = more training data (but redundancy). Larger stride = less overlap = faster but less context."
+      },
+      {
+        "type": "code",
+        "title": "Creating Input-Target Pairs",
+        "description": "For language modeling, we predict the next token:",
+        "code": "def create_training_pairs(windows):\n    pairs = []\n    \n    for window in windows:\n        # Split: all but last token = input, last token = target\n        input_seq = window[:-1]\n        target = window[-1]\n        pairs.append((input_seq, target))\n    \n    return pairs\n\n# Try it!\npairs = create_training_pairs(windows)\n\nfor i, (input_seq, target) in enumerate(pairs):\n    print(f\"Example {i+1}:\")\n    print(f\"  Input:  {input_seq}\")\n    print(f\"  Target: {target}\")\n    print()\n\n# Output:\n# Example 1:\n#   Input:  ['I', 'love', 'building']\n#   Target: AI\n#\n# Example 2:\n#   Input:  ['building', 'AI', 'models']\n#   Target: every\n#\n# Example 3:\n#   Input:  ['models', 'every']\n#   Target: day",
+        "explanation": "This is next-token prediction! Given 'I love building', predict 'AI'. This simple task is how ChatGPT learns to generate text."
+      },
+      {
+        "type": "code",
+        "title": "Batching for Efficient Training",
+        "description": "Group examples into batches for parallel processing:",
+        "code": "import random\n\ndef create_batches(pairs, batch_size, shuffle=True):\n    if shuffle:\n        random.shuffle(pairs)\n    \n    batches = []\n    for i in range(0, len(pairs), batch_size):\n        batch = pairs[i:i + batch_size]\n        batches.append(batch)\n    \n    return batches\n\n# Try it!\npairs = [\n    ([\"I\", \"love\"], \"AI\"),\n    ([\"building\", \"models\"], \"is\"),\n    ([\"deep\", \"learning\"], \"rocks\"),\n    ([\"transformers\", \"are\"], \"cool\"),\n    ([\"GPT\", \"is\"], \"amazing\"),\n]\n\nbatches = create_batches(pairs, batch_size=2, shuffle=True)\n\nfor i, batch in enumerate(batches):\n    print(f\"Batch {i+1}:\")\n    for input_seq, target in batch:\n        print(f\"  {input_seq} → {target}\")\n    print()\n\n# Output (random order due to shuffle!):\n# Batch 1:\n#   ['deep', 'learning'] → rocks\n#   ['GPT', 'is'] → amazing\n#\n# Batch 2:\n#   ['I', 'love'] → AI\n#   ['transformers', 'are'] → cool\n#\n# Batch 3:\n#   ['building', 'models'] → is",
+        "explanation": "Shuffling prevents the model from learning document order. Batching lets GPU process multiple examples in parallel (batch_size=32 is common)."
+      }
+    ],
+    "keyPoints": [
+      "Sliding windows create overlapping training examples from continuous text",
+      "Window size = context length (how much history the model sees)",
+      "Stride controls overlap: smaller stride = more data but redundancy",
+      "Each window split into input (all but last token) and target (last token)",
+      "Batching + shuffling = efficient and unbiased training"
+    ],
+    "realWorld": [
+      "**GPT-3:** Trained with 2048-token windows, stride varies by dataset",
+      "**Why overlap matters:** Without it, model wouldn't learn how sentences flow together",
+      "**Compute trade-off:** Stride=1 gives max data but 10x slower training. Stride=window_size/2 is common",
+      "**Production tip:** Use DataLoader libraries (PyTorch, TensorFlow) instead of rolling your own"
+    ],
+    "challenge": {
+      "unlocks": "embeddings-and-dataloader",
+      "preview": "Your challenge: build a PyTorch DataLoader that samples sliding windows from real text, handles batching, and shuffles properly. You'll see how production training pipelines work!",
+      "xp": 100
+    },
+    "easterEgg": "Fun fact: GPT-3's training used TRILLIONS of tokens. At stride=512, that's billions of training examples. Your laptop would take 1000+ years to train it!"
+  },
+  {
+    "id": "embeddings",
+    "level": 5,
+    "title": "The Vector Navigator",
+    "subtitle": "Mapping Words to Meaning Space",
+    "emoji": "🗺️",
+    "story": "The Numerians have learned to read token IDs, but they face a new problem: the numbers are meaningless! ID 42 isn't 'more related' to ID 43 than to ID 9999. They need a way to represent meaning—where similar words are close together in space. Enter embeddings: you transform each token ID into a point in high-dimensional space (like GPS coordinates). Now 'king' and 'queen' are near each other, far from 'banana'. This is how AI understands meaning.",
+    "hook": "How do you teach a computer that 'happy' and 'joyful' mean similar things? You put them in the same neighborhood.",
+    "concept": "Embeddings are dense vector representations of tokens. Instead of a token being just an ID (e.g., 42), it becomes a list of numbers like [0.2, -0.5, 0.8, ...]. These vectors capture semantic meaning:\n\n• Similar words → similar vectors\n• Vector math works: king - man + woman ≈ queen\n• Position in space encodes relationships\n\nEmbedding layer: A lookup table that maps token_id → vector. For vocab_size=50,000 and embedding_dim=768, that's a 50,000 × 768 matrix. The values are learned during training!",
+    "analogy": "**The City Map Analogy:**\n\nImagine plotting every word on a city map:\n\n📍 'King' at coordinates (5, 8)\n📍 'Queen' at coordinates (5.1, 7.9) — very close!\n📍 'Banana' at coordinates (52, 103) — far away\n📍 'Fruit' at coordinates (53, 104) — near banana\n\nSimilar meanings = similar coordinates. The model learns these positions by seeing millions of examples. Eventually:\n\n- All royalty words cluster in one neighborhood\n- All food words in another\n- All action words in another\n\nVector math works: King - Man + Woman = ? Walk from King to Man (male direction), then reverse to Woman. You land near Queen!",
+    "visual": "TOKEN → EMBEDDING\n\nToken ID: 42 (just a number, no meaning)\n        ↓\nEmbedding Layer (learned lookup table)\n        ↓\nVector: [0.2, -0.5, 0.8, 0.1, -0.3, ...]  (768 dimensions)\n\nVISUALIZATION (3D projection):\n\n      z ↑\n        │     'queen' ●\n        │   ● 'king'\n        │\n        │         ● 'prince'\n        │\n────────┼─────────────────→ x\n        │\n        │\n        │        ● 'banana'\n        │      ● 'apple'\n        ↓ y\n\nSimilar words cluster together!\n\nPOSITIONAL ENCODING (adds position info):\n\nToken embedding:     [0.2, -0.5, 0.8, ...]\n+ Position embedding: [0.1, 0.0, -0.1, ...]  (position 3)\n= Final embedding:    [0.3, -0.5, 0.7, ...]",
+    "interactive": [
+      {
+        "type": "code",
+        "title": "Creating an Embedding Layer",
+        "description": "Let's build a simple embedding layer in PyTorch:",
+        "code": "import torch\nimport torch.nn as nn\n\n# Create embedding layer\nvocab_size = 10000  # Total tokens in vocabulary\nembedding_dim = 128  # Size of each embedding vector\n\nembedding_layer = nn.Embedding(vocab_size, embedding_dim)\n\nprint(f\"Embedding matrix shape: {embedding_layer.weight.shape}\")\nprint(f\"Total parameters: {vocab_size * embedding_dim:,}\")\n\n# Lookup embeddings for token IDs\ntoken_ids = torch.tensor([42, 100, 5])\nembeddings = embedding_layer(token_ids)\n\nprint(f\"\\nInput token IDs: {token_ids}\")\nprint(f\"Output embeddings shape: {embeddings.shape}\")\nprint(f\"\\nFirst token (ID 42) embedding:\")\nprint(embeddings[0][:10])  # Show first 10 dimensions\n\n# Output:\n# Embedding matrix shape: torch.Size([10000, 128])\n# Total parameters: 1,280,000\n#\n# Input token IDs: tensor([42, 100, 5])\n# Output embeddings shape: torch.Size([3, 128])\n#\n# First token (ID 42) embedding:\n# tensor([-0.5234,  0.1234, -0.8765, ...], grad_fn=<...>)",
+        "explanation": "The embedding layer is just a big lookup table! Give it a token ID, get back a vector. These vectors are randomly initialized and learned during training."
+      },
+      {
+        "type": "code",
+        "title": "Positional Encoding",
+        "description": "Tokens need position info (word order matters!):",
+        "code": "import math\n\ndef create_positional_encoding(max_len, d_model):\n    \"\"\"Create sinusoidal positional encoding\"\"\"\n    position = torch.arange(max_len).unsqueeze(1)\n    div_term = torch.exp(torch.arange(0, d_model, 2) * \n                        (-math.log(10000.0) / d_model))\n    \n    pos_encoding = torch.zeros(max_len, d_model)\n    pos_encoding[:, 0::2] = torch.sin(position * div_term)\n    pos_encoding[:, 1::2] = torch.cos(position * div_term)\n    \n    return pos_encoding\n\n# Try it!\nmax_length = 100  # Max sequence length\nd_model = 128     # Embedding dimension\n\npos_encoding = create_positional_encoding(max_length, d_model)\n\nprint(f\"Positional encoding shape: {pos_encoding.shape}\")\nprint(f\"\\nPosition 0 (first token):\")\nprint(pos_encoding[0][:10])\nprint(f\"\\nPosition 5:\")\nprint(pos_encoding[5][:10])\n\n# Output:\n# Positional encoding shape: torch.Size([100, 128])\n#\n# Position 0 (first token):\n# tensor([0.0000, 1.0000, 0.0000, 1.0000, ...])\n#\n# Position 5:\n# tensor([-0.9589,  0.2837, -0.3679,  0.9298, ...])",
+        "explanation": "Positional encoding uses sin/cos waves at different frequencies. Each position gets a unique pattern that the model can learn to interpret."
+      },
+      {
+        "type": "code",
+        "title": "Combining Token + Position Embeddings",
+        "description": "Final embedding = token vector + position vector:",
+        "code": "class EmbeddingWithPosition(nn.Module):\n    def __init__(self, vocab_size, d_model, max_len):\n        super().__init__()\n        self.token_embedding = nn.Embedding(vocab_size, d_model)\n        self.pos_encoding = create_positional_encoding(max_len, d_model)\n        self.d_model = d_model\n    \n    def forward(self, token_ids):\n        # Get token embeddings\n        token_emb = self.token_embedding(token_ids) * math.sqrt(self.d_model)\n        \n        # Add positional encoding\n        seq_len = token_ids.size(1)\n        pos_emb = self.pos_encoding[:seq_len, :].to(token_ids.device)\n        \n        # Combine\n        return token_emb + pos_emb\n\n# Try it!\nmodel = EmbeddingWithPosition(vocab_size=10000, d_model=128, max_len=512)\n\n# Batch of 2 sequences, each 5 tokens\ntoken_ids = torch.tensor([\n    [42, 100, 5, 88, 234],\n    [7, 99, 12, 456, 78]\n])\n\nembeddings = model(token_ids)\nprint(f\"Input shape: {token_ids.shape}\")  # [batch=2, seq_len=5]\nprint(f\"Output shape: {embeddings.shape}\")  # [batch=2, seq_len=5, d_model=128]\nprint(f\"\\nEach token is now a {embeddings.shape[-1]}-dimensional vector!\")\n\n# Output:\n# Input shape: torch.Size([2, 5])\n# Output shape: torch.Size([2, 5, 128])\n#\n# Each token is now a 128-dimensional vector!",
+        "explanation": "Now each token has meaning (from token embedding) AND position (from positional encoding). The model can tell 'the' at position 0 from 'the' at position 5!"
+      }
+    ],
+    "keyPoints": [
+      "Embeddings map discrete tokens to continuous vector space",
+      "Similar meanings → nearby vectors (learned from data)",
+      "Embedding dimension (e.g., 768) is a hyperparameter (bigger = more capacity)",
+      "Positional encoding adds sequence order information",
+      "Final embedding = token embedding + positional encoding"
+    ],
+    "realWorld": [
+      "**GPT-3:** Uses 12,288-dimensional embeddings (huge!). That's 50,257 tokens × 12,288 dims = 617M parameters just for embeddings",
+      "**Word2Vec magic:** 'king - man + woman ≈ queen' actually works in practice!",
+      "**Transfer learning:** Pre-trained embeddings (from models like BERT) capture years of training. Use them!",
+      "**Visualization:** Use t-SNE or UMAP to project 768D embeddings to 2D and see word clusters"
+    ],
+    "challenge": {
+      "unlocks": "embeddings-and-dataloader",
+      "preview": "Your challenge: build a complete embedding system with token + positional encoding, visualize the embeddings in 2D using t-SNE, and see if similar words cluster together!",
+      "xp": 100
+    },
+    "easterEgg": "Mind-blowing fact: In GPT-3's embedding space, 'Paris' - 'France' + 'Italy' ≈ 'Rome'. The model learned geography from pure text prediction!"
+  }
+]
