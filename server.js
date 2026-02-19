@@ -18,6 +18,7 @@ const QUIZ_FILE = path.join(__dirname, 'data', 'quiz-state.json');
 const CHALLENGES_FILE = path.join(__dirname, 'data', 'challenges.json');
 const MANNING_CHALLENGES_FILE = path.join(__dirname, 'data', 'manning-challenges.json');
 const FLASHCARDS_FILE = path.join(__dirname, 'data', 'flashcards.json');
+const LESSON_CONTENT_FILE = path.join(__dirname, 'data', 'lesson-content.json');
 
 // Ensure data directory exists
 if (!fs.existsSync(path.join(__dirname, 'data'))) {
@@ -32,6 +33,7 @@ function initDataFiles() {
       streak: 0,
       lastActive: null,
       completedSkills: [],
+      completedLessons: [],
       milestones: []
     };
     fs.writeFileSync(PROGRESS_FILE, JSON.stringify(initialProgress, null, 2));
@@ -504,6 +506,89 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
+// Lessons API
+app.get('/api/lessons', (req, res) => {
+  try {
+    if (!fs.existsSync(LESSON_CONTENT_FILE)) {
+      return res.status(404).json({ error: 'Lesson content not found' });
+    }
+    const lessons = readJSON(LESSON_CONTENT_FILE);
+    res.json(lessons);
+  } catch (error) {
+    console.error('Error loading lessons:', error);
+    res.status(500).json({ error: 'Failed to load lessons' });
+  }
+});
+
+app.get('/api/lessons/:id', (req, res) => {
+  try {
+    const lessons = readJSON(LESSON_CONTENT_FILE);
+    const lesson = lessons.find(l => l.id === req.params.id);
+    
+    if (!lesson) {
+      return res.status(404).json({ error: 'Lesson not found' });
+    }
+    
+    res.json(lesson);
+  } catch (error) {
+    console.error('Error loading lesson:', error);
+    res.status(500).json({ error: 'Failed to load lesson' });
+  }
+});
+
+app.post('/api/lessons/:id/complete', (req, res) => {
+  try {
+    const progress = readJSON(PROGRESS_FILE);
+    const lessons = readJSON(LESSON_CONTENT_FILE);
+    const lesson = lessons.find(l => l.id === req.params.id);
+    
+    if (!lesson) {
+      return res.status(404).json({ error: 'Lesson not found' });
+    }
+    
+    // Initialize completedLessons if not exists
+    if (!progress.completedLessons) {
+      progress.completedLessons = [];
+    }
+    
+    // Check if already completed
+    if (progress.completedLessons.includes(lesson.id)) {
+      return res.json({ 
+        message: 'Already completed',
+        xp: progress.xp,
+        streak: progress.streak
+      });
+    }
+    
+    // Add to completed lessons
+    progress.completedLessons.push(lesson.id);
+    
+    // Award XP (100 per lesson)
+    progress.xp += 100;
+    
+    // Update streak
+    const newStreak = updateStreak();
+    
+    // Calculate milestones
+    const milestones = checkMilestones(progress.xp);
+    
+    writeJSON(PROGRESS_FILE, progress);
+    
+    res.json({
+      xp: progress.xp,
+      xpGained: 100,
+      streak: newStreak,
+      milestones,
+      completedLessons: progress.completedLessons.length,
+      message: `+100 XP! Total: ${progress.xp}`
+    });
+  } catch (error) {
+    console.error('Error completing lesson:', error);
+    res.status(500).json({ error: 'Failed to complete lesson' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Learning Accelerator running on http://localhost:${PORT}`);
+  console.log(`📚 Lessons available at http://localhost:${PORT}/lessons.html`);
 });

@@ -92,6 +92,9 @@ async function loadDashboard() {
     // Update milestones
     renderMilestones(dashboardData.milestones);
 
+    // Update next lesson (new!)
+    await loadNextLesson();
+
     // Update next challenge
     if (dashboardData.nextChallenge) {
       document.getElementById('next-challenge-name').textContent = 
@@ -106,6 +109,31 @@ async function loadDashboard() {
 
   } catch (error) {
     console.error('Failed to load dashboard:', error);
+  }
+}
+
+// Load next lesson for dashboard
+async function loadNextLesson() {
+  try {
+    const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
+    const lessons = await lessonsResponse.json();
+    
+    const progressResponse = await fetch(`${API_BASE}/api/progress`);
+    const progress = await progressResponse.json();
+    
+    const completedLessons = progress.completedLessons || [];
+    const nextLesson = lessons.find(lesson => !completedLessons.includes(lesson.id));
+    
+    if (nextLesson) {
+      document.getElementById('next-lesson-name').textContent = 
+        `${nextLesson.title} (+100 XP)`;
+    } else {
+      document.getElementById('next-lesson-name').textContent = 
+        'All lessons complete! 🎉';
+    }
+  } catch (error) {
+    console.error('Failed to load next lesson:', error);
+    document.getElementById('next-lesson-name').textContent = 'View lessons';
   }
 }
 
