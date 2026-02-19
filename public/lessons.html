@@ -17,8 +17,7 @@
     <div class="nav-menu">
       <a href="index.html" class="nav-link">Dashboard</a>
       <a href="lessons.html" class="nav-link active">Lessons</a>
-      <a href="index.html#challenges" class="nav-link">Challenges</a>
-      <a href="index.html#progress" class="nav-link">Progress</a>
+      <a href="code-playground.html" class="nav-link">Code Playground</a>
     </div>
   </nav>
 
@@ -28,17 +27,18 @@
     <!-- Loading State -->
     <div id="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading your learning journey...</p>
+      <p>Loading...</p>
     </div>
 
-    <!-- Lessons List View -->
+    <!-- Lessons List View (Simplified) -->
     <div id="lessons-list" class="view" style="display: none;">
       <div class="hero">
         <h1>🎓 Your Learning Journey</h1>
         <p class="subtitle">Master the foundations through story-driven lessons</p>
       </div>
 
-      <div class="progress-overview">
+      <!-- Progress Overview (hidden initially) -->
+      <div class="progress-overview" id="progress-overview" style="display: none;">
         <div class="level-badge">
           <div class="level-number" id="current-level">1</div>
           <div class="level-label">Current Level</div>
@@ -51,7 +51,7 @@
             <div class="xp-fill" id="lesson-xp-fill" style="width: 0%"></div>
           </div>
         </div>
-        <div class="streak-display">
+        <div class="streak-display" id="streak-display" style="display: none;">
           <span class="streak-icon">🔥</span>
           <span class="streak-number" id="lesson-streak">0</span>
           <span class="streak-label">day streak</span>
@@ -66,138 +66,30 @@
         </div>
       </div>
 
-      <!-- Lesson Path -->
-      <div class="lesson-path-section">
-        <h2>🗺️ Foundation Path</h2>
+      <!-- Completed Lessons (hidden initially) -->
+      <div class="completed-section" id="completed-section" style="display: none;">
+        <h2>✅ Completed</h2>
+        <div id="completed-list"></div>
+      </div>
+
+      <!-- View All Lessons Toggle -->
+      <div class="view-all-section" style="text-align: center; margin-top: 2rem;">
+        <button class="btn-link" id="toggle-all-lessons">View All Lessons</button>
+      </div>
+
+      <!-- Lesson Path (collapsed initially) -->
+      <div class="lesson-path-section" id="lesson-path-section" style="display: none;">
+        <h2>🗺️ All Lessons</h2>
         <div class="lesson-path" id="lesson-path">
           <!-- Populated by JS -->
         </div>
       </div>
 
-      <!-- Achievements Preview -->
-      <div class="achievements-preview" id="achievements-preview">
+      <!-- Achievements (hidden initially) -->
+      <div class="achievements-preview" id="achievements-preview" style="display: none;">
         <h2>🏆 Achievements</h2>
         <div class="achievement-grid" id="achievement-grid">
           <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
-
-    <!-- Individual Lesson View -->
-    <div id="lesson-detail" class="view" style="display: none;">
-      <div class="lesson-header">
-        <button class="back-btn" id="back-to-lessons">
-          ← Back to Lessons
-        </button>
-        <div class="lesson-meta">
-          <span class="lesson-level-badge" id="detail-level">Level 1</span>
-          <span class="lesson-xp-badge" id="detail-xp">+100 XP</span>
-        </div>
-      </div>
-
-      <div class="lesson-content">
-        <!-- Story Section -->
-        <section class="story-section">
-          <div class="emoji-hero" id="lesson-emoji">🧩</div>
-          <h1 class="lesson-title" id="lesson-title">The Language Puzzle</h1>
-          <p class="lesson-subtitle" id="lesson-subtitle">Breaking Words Into Pieces</p>
-          <div class="story-box">
-            <p class="story-text" id="lesson-story"></p>
-          </div>
-          <div class="hook-box">
-            <span class="hook-icon">💡</span>
-            <p class="hook-text" id="lesson-hook"></p>
-          </div>
-        </section>
-
-        <!-- Concept Section -->
-        <section class="concept-section">
-          <h2>🎯 The Core Idea</h2>
-          <div class="concept-box" id="lesson-concept"></div>
-        </section>
-
-        <!-- Analogy Section -->
-        <section class="analogy-section">
-          <h2>🌉 Think of It This Way...</h2>
-          <div class="analogy-box" id="lesson-analogy"></div>
-        </section>
-
-        <!-- Visual Section -->
-        <section class="visual-section">
-          <h2>👁️ Visualizing It</h2>
-          <div class="visual-box">
-            <pre id="lesson-visual"></pre>
-          </div>
-        </section>
-
-        <!-- Interactive Examples -->
-        <section class="interactive-section">
-          <h2>💻 Try It Yourself</h2>
-          <div id="interactive-examples"></div>
-        </section>
-
-        <!-- Key Points -->
-        <section class="keypoints-section">
-          <h2>🔑 Key Takeaways</h2>
-          <ul class="keypoints-list" id="keypoints-list"></ul>
-        </section>
-
-        <!-- Real World -->
-        <section class="realworld-section">
-          <h2>🌍 Real-World Impact</h2>
-          <ul class="realworld-list" id="realworld-list"></ul>
-        </section>
-
-        <!-- Easter Egg -->
-        <div class="easter-egg-section" id="easter-egg-section">
-          <details>
-            <summary>🥚 Hidden Knowledge (click to reveal)</summary>
-            <p class="easter-egg-text" id="easter-egg-text"></p>
-          </details>
-        </div>
-
-        <!-- Challenge Preview -->
-        <section class="challenge-preview-section">
-          <h2>⚔️ Ready to Build?</h2>
-          <div class="challenge-preview-box">
-            <p id="challenge-preview-text"></p>
-            <div class="challenge-reward">
-              <span class="reward-icon">💎</span>
-              <span class="reward-text">+<span id="challenge-xp">100</span> XP</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- Completion Actions -->
-        <div class="lesson-actions">
-          <button class="btn btn-primary btn-large" id="complete-lesson-btn">
-            ✅ Mark as Complete & Continue
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Completion Modal -->
-    <div id="completion-modal" class="modal" style="display: none;">
-      <div class="modal-content celebration">
-        <div class="confetti">🎉</div>
-        <h2 class="completion-title">Lesson Complete!</h2>
-        <div class="xp-reward">
-          <span class="xp-amount">+<span id="reward-xp">100</span> XP</span>
-        </div>
-        <div class="badge-unlock" id="badge-unlock">
-          <div class="badge-earned">
-            <span class="badge-emoji" id="earned-badge-emoji">🧩</span>
-            <span class="badge-name" id="earned-badge-name">Word Breaker</span>
-          </div>
-        </div>
-        <div class="level-up" id="level-up-notice" style="display: none;">
-          <span class="level-up-icon">⬆️</span>
-          <span class="level-up-text">Level Up! You're now Level <span id="new-level">2</span></span>
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-primary" id="next-lesson-btn">Continue to Next Lesson →</button>
-          <button class="btn btn-secondary" id="view-challenge-btn">View Build Challenge</button>
         </div>
       </div>
     </div>

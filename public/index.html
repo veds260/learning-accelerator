@@ -27,19 +27,19 @@
     <!-- Dashboard View -->
     <div id="dashboard" class="view active">
       <div class="hero">
-        <h1>Manning: Build a Large Language Model (From Scratch)</h1>
-        <p class="subtitle">Learn by doing - read concepts, practice code</p>
+        <h1>Learn to Build Language Models</h1>
+        <p class="subtitle">Story-driven Python lessons that stick</p>
       </div>
 
-      <!-- Simple Stats -->
-      <div class="stats-grid">
+      <!-- Simple Stats (initially hidden for new users) -->
+      <div class="stats-grid" id="stats-section" style="display: none;">
         <div class="stat-card">
           <div class="stat-icon">📚</div>
           <div class="stat-value" id="lessons-completed">0/5</div>
           <div class="stat-label">Lessons Completed</div>
         </div>
         
-        <div class="stat-card">
+        <div class="stat-card" id="xp-card" style="display: none;">
           <div class="stat-icon">⚡</div>
           <div class="stat-value" id="xp-value">0</div>
           <div class="stat-label">Total XP</div>
@@ -48,13 +48,14 @@
 
       <!-- Main Actions -->
       <div class="section">
-        <h2>What's Next</h2>
+        <h2 id="whats-next-heading">What's Next</h2>
         <div class="actions-grid">
           <button class="action-btn primary" onclick="window.location.href='lessons.html'">
-            <span class="btn-icon">📚</span>
+            <span class="btn-icon">🧩</span>
             <div class="btn-content">
-              <div class="btn-title">Continue Learning</div>
-              <div class="btn-subtitle" id="next-lesson-name">Start your journey</div>
+              <div class="btn-title" id="next-lesson-title">The Language Puzzle</div>
+              <div class="btn-subtitle" id="next-lesson-subtitle">How do computers read text?</div>
+              <div class="btn-meta">~10 minutes</div>
             </div>
           </button>
           
@@ -62,18 +63,16 @@
             <span class="btn-icon">💻</span>
             <div class="btn-content">
               <div class="btn-title">Code Playground</div>
-              <div class="btn-subtitle">Practice Python exercises</div>
+              <div class="btn-subtitle">Practice Python</div>
             </div>
           </button>
         </div>
       </div>
 
-      <!-- Recent Progress -->
-      <div class="section">
-        <h2>Your Progress</h2>
-        <div id="completed-lessons-list">
-          <p style="color: var(--text-secondary);">No lessons completed yet. Start learning!</p>
-        </div>
+      <!-- Recent Progress (initially hidden) -->
+      <div class="section" id="progress-section" style="display: none;">
+        <h2>Recently Completed</h2>
+        <div id="completed-lessons-list"></div>
       </div>
     </div>
 
@@ -108,35 +107,49 @@
         console.log('Progress:', progress);
         console.log('Lessons:', lessons);
         
-        // Update stats
-        const completedCount = progress.completedLessons ? progress.completedLessons.length : 0;
-        document.getElementById('lessons-completed').textContent = `${completedCount}/${lessons.length}`;
-        document.getElementById('xp-value').textContent = progress.xp || 0;
+        const completedLessons = progress.completedLessons || [];
+        const completedCount = completedLessons.length;
+        
+        // Progressive disclosure: show stats only after first lesson
+        if (completedCount > 0) {
+          document.getElementById('stats-section').style.display = 'grid';
+          document.getElementById('lessons-completed').textContent = `${completedCount}/${lessons.length}`;
+          
+          // Show XP after 1st lesson (celebration!)
+          if (progress.xp > 0) {
+            document.getElementById('xp-card').style.display = 'block';
+            document.getElementById('xp-value').textContent = progress.xp;
+          }
+          
+          // Show progress section
+          document.getElementById('progress-section').style.display = 'block';
+          const completedList = lessons
+            .filter(l => completedLessons.includes(l.id))
+            .map(l => `<div class="completed-lesson">✅ ${l.title}</div>`)
+            .join('');
+          document.getElementById('completed-lessons-list').innerHTML = completedList;
+        }
         
         // Find next lesson
-        const completedLessons = progress.completedLessons || [];
         const nextLesson = lessons.find(l => !completedLessons.includes(l.id));
         
         if (nextLesson) {
-          document.getElementById('next-lesson-name').textContent = nextLesson.title;
+          document.getElementById('next-lesson-title').textContent = nextLesson.title;
+          document.getElementById('next-lesson-subtitle').textContent = nextLesson.subtitle;
+          document.getElementById('whats-next-heading').textContent = completedCount > 0 ? "Continue Learning" : "Start Learning";
         } else {
-          document.getElementById('next-lesson-name').textContent = 'All lessons complete! 🎉';
-        }
-        
-        // Show completed lessons
-        if (completedLessons.length > 0) {
-          const completedList = lessons
-            .filter(l => completedLessons.includes(l.id))
-            .map(l => `<div style="padding: 0.5rem; margin-bottom: 0.5rem; background: var(--bg-secondary); border-radius: 8px;">✅ ${l.title}</div>`)
-            .join('');
-          document.getElementById('completed-lessons-list').innerHTML = completedList;
+          document.getElementById('next-lesson-title').textContent = 'All lessons complete!';
+          document.getElementById('next-lesson-subtitle').textContent = 'You finished the course 🎉';
+          document.querySelector('.btn-meta').textContent = '';
         }
         
         console.log('✅ Dashboard loaded successfully');
         
       } catch (error) {
         console.error('❌ Dashboard load error:', error);
-        alert(`Error loading dashboard: ${error.message}\n\nCheck console for details.`);
+        // Show user-friendly error
+        document.querySelector('.hero h1').textContent = 'Error loading dashboard';
+        document.querySelector('.hero .subtitle').textContent = error.message;
       }
     }
   </script>

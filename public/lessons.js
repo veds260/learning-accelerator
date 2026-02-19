@@ -64,26 +64,57 @@ function renderLessonsView() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('lessons-list').style.display = 'block';
   
-  // Update progress overview
-  const totalLessonsXP = lessonsData.reduce((sum, lesson) => sum + 100, 0);
-  const earnedXP = userProgress.completedLessons.length * 100;
+  const completedCount = userProgress.completedLessons.length;
   
-  document.getElementById('current-level').textContent = userProgress.currentLevel;
-  document.getElementById('lesson-xp').textContent = earnedXP;
-  document.getElementById('lesson-xp-total').textContent = totalLessonsXP;
-  document.getElementById('lesson-streak').textContent = userProgress.streak;
-  
-  const xpPercent = (earnedXP / totalLessonsXP) * 100;
-  document.getElementById('lesson-xp-fill').style.width = `${xpPercent}%`;
+  // Progressive disclosure: show stats only after first lesson
+  if (completedCount > 0) {
+    document.getElementById('progress-overview').style.display = 'grid';
+    
+    // Update progress overview
+    const totalLessonsXP = lessonsData.reduce((sum, lesson) => sum + 100, 0);
+    const earnedXP = completedCount * 100;
+    
+    document.getElementById('current-level').textContent = userProgress.currentLevel;
+    document.getElementById('lesson-xp').textContent = earnedXP;
+    document.getElementById('lesson-xp-total').textContent = totalLessonsXP;
+    
+    const xpPercent = (earnedXP / totalLessonsXP) * 100;
+    document.getElementById('lesson-xp-fill').style.width = `${xpPercent}%`;
+    
+    // Show streak after 3 lessons
+    if (completedCount >= 3 && userProgress.streak > 0) {
+      document.getElementById('streak-display').style.display = 'flex';
+      document.getElementById('lesson-streak').textContent = userProgress.streak;
+    }
+    
+    // Show completed lessons
+    document.getElementById('completed-section').style.display = 'block';
+    renderCompletedLessons();
+    
+    // Show achievements after first lesson
+    document.getElementById('achievements-preview').style.display = 'block';
+    renderAchievements();
+  }
   
   // Render next lesson card
   renderNextLessonCard();
   
-  // Render lesson path
+  // Render lesson path (collapsed by default)
   renderLessonPath();
+}
+
+// Render completed lessons
+function renderCompletedLessons() {
+  const container = document.getElementById('completed-list');
+  const completed = lessonsData.filter(l => userProgress.completedLessons.includes(l.id));
   
-  // Render achievements
-  renderAchievements();
+  if (completed.length === 0) return;
+  
+  container.innerHTML = completed.map(lesson => `
+    <div class="completed-lesson" onclick="window.location.href='lesson-detail.html?id=${lesson.id}'">
+      ✅ ${lesson.title}
+    </div>
+  `).join('');
 }
 
 // Render "What's Next" card
@@ -363,6 +394,23 @@ function setupEventListeners() {
       completeLesson(lessonId);
     }
   });
+  
+  // Toggle "View All Lessons"
+  const toggleBtn = document.getElementById('toggle-all-lessons');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const pathSection = document.getElementById('lesson-path-section');
+      const isHidden = pathSection.style.display === 'none';
+      
+      if (isHidden) {
+        pathSection.style.display = 'block';
+        toggleBtn.textContent = 'Hide All Lessons';
+      } else {
+        pathSection.style.display = 'none';
+        toggleBtn.textContent = 'View All Lessons';
+      }
+    });
+  }
 }
 
 // Utility functions

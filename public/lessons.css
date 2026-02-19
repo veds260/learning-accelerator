@@ -826,28 +826,243 @@
   font-size: 1.1rem;
 }
 
+/* Button Link Style */
+.btn-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-link:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* Completed Lesson Styles */
+.completed-lesson {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 3px solid var(--success);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.completed-lesson:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(4px);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  /* Progress Overview */
   .progress-overview {
     flex-direction: column;
     text-align: center;
+    gap: 1rem;
+    padding: 1.5rem 1rem;
   }
 
-  .emoji-hero {
-    font-size: 3.5rem;
+  .level-badge {
+    margin: 0 auto;
   }
 
-  .lesson-title {
+  .xp-progress {
+    width: 100%;
+  }
+
+  /* Next Lesson Card */
+  .next-lesson-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .next-lesson-emoji {
+    font-size: 3rem;
+  }
+
+  .next-lesson-title {
+    font-size: 1.5rem;
+  }
+
+  .next-lesson-cta {
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  /* Lesson Cards */
+  .lesson-card {
+    padding: 1.25rem 1rem;
+  }
+
+  .lesson-card-emoji {
     font-size: 2rem;
   }
 
-  .achievement-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  .lesson-card-title {
+    font-size: 1.125rem;
   }
 
+  /* Achievement Grid */
+  .achievement-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .achievement-emoji {
+    font-size: 2rem;
+  }
+
+  /* Lesson Detail */
   .lesson-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+    padding: 1rem;
+  }
+
+  .back-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lesson-content {
+    padding: 1rem;
+  }
+
+  /* Emoji Hero */
+  .emoji-hero {
+    font-size: 3.5rem;
+  }
+
+  /* Lesson Title */
+  .lesson-title {
+    font-size: 1.75rem;
+  }
+
+  .lesson-subtitle {
+    font-size: 1.125rem;
+  }
+
+  /* Story Box */
+  .story-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .story-text {
+    font-size: 1rem;
+  }
+
+  /* Hook Box */
+  .hook-box {
+    padding: 1.25rem 1rem;
+  }
+
+  .hook-text {
+    font-size: 0.9375rem;
+  }
+
+  /* Section Headings */
+  .concept-section h2,
+  .analogy-section h2,
+  .visual-section h2,
+  .interactive-section h2,
+  .keypoints-section h2,
+  .realworld-section h2,
+  .challenge-preview-section h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Boxes */
+  .concept-box,
+  .analogy-box,
+  .visual-box,
+  .example-card {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Code Blocks */
+  .example-code,
+  .visual-box pre {
+    font-size: 0.875rem;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  /* Lists */
+  .keypoints-list li,
+  .realworld-list li {
+    font-size: 0.9375rem;
+    padding-left: 2rem;
+  }
+
+  /* Challenge Preview */
+  .challenge-preview-box {
+    padding: 1.5rem 1rem;
+  }
+
+  .challenge-preview-box p {
+    font-size: 1rem;
+  }
+
+  /* Buttons */
+  .btn-large {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.125rem;
+  }
+
+  /* Completion Modal */
+  .modal-content.celebration {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+  }
+
+  .completion-title {
+    font-size: 1.75rem;
+  }
+
+  .xp-amount {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.75rem;
+  }
+
+  .badge-earned {
+    padding: 1.25rem 1rem;
+  }
+
+  .badge-emoji {
+    font-size: 2.5rem;
+  }
+
+  .badge-name {
+    font-size: 1.125rem;
+  }
+}
+
+/* Extra Small Devices */
+@media (max-width: 375px) {
+  .emoji-hero {
+    font-size: 3rem;
+  }
+
+  .lesson-title {
+    font-size: 1.5rem;
+  }
+
+  .next-lesson-emoji {
+    font-size: 2.5rem;
+  }
+
+  .story-box,
+  .hook-box,
+  .concept-box,
+  .analogy-box {
+    padding: 1rem;
   }
 }
