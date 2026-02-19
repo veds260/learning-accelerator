@@ -186,14 +186,28 @@ function answerQuestion(selected, correct) {
       <div class="feedback-icon">${isCorrect ? '✅' : '❌'}</div>
       <h3>${isCorrect ? 'Correct!' : 'Not quite'}</h3>
       <p>${question.explanation}</p>
-      <button class="btn primary" onclick="nextQuestion()">Next Question →</button>
     </div>
   `;
+  
+  // Auto-advance to next question after 1.5 seconds
+  setTimeout(() => {
+    nextQuestion();
+  }, 1500);
 }
 
 function nextQuestion() {
   currentQuizIndex++;
-  renderQuiz();
+  
+  // If quiz is done, auto-advance to code after showing results
+  const totalQuestions = quizData.inLessonQuizzes[0].questions.length;
+  if (currentQuizIndex >= totalQuestions) {
+    renderQuiz(); // Show results
+    setTimeout(() => {
+      nextStep(); // Auto-advance to code after 2 seconds
+    }, 2000);
+  } else {
+    renderQuiz();
+  }
 }
 
 function showQuizResults() {
@@ -209,10 +223,14 @@ function showQuizResults() {
         <div class="score-percentage">${percentage}%</div>
       </div>
       <p>${percentage >= 80 ? '🎉 Excellent work!' : percentage >= 60 ? '👍 Good job!' : '💪 Keep practicing!'}</p>
+      <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">Moving to coding exercise...</p>
     </div>
   `;
   
-  document.getElementById('quiz-actions').style.display = 'block';
+  // Auto-advance to code after showing results briefly
+  setTimeout(() => {
+    nextStep();
+  }, 2000);
 }
 
 // Render code exercise
