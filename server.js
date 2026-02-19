@@ -591,4 +591,12 @@ app.post('/api/lessons/:id/complete', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Learning Accelerator running on http://localhost:${PORT}`);
   console.log(`📚 Lessons available at http://localhost:${PORT}/lessons.html`);
+  
+  // Verify lesson content file exists
+  if (fs.existsSync(LESSON_CONTENT_FILE)) {
+    const lessons = JSON.parse(fs.readFileSync(LESSON_CONTENT_FILE, 'utf8'));
+    console.log(`✅ Loaded ${lessons.length} lessons from lesson-content.json`);
+  } else {
+    console.error(`❌ CRITICAL: lesson-content.json NOT FOUND at ${LESSON_CONTENT_FILE}`);
+  }
 });
