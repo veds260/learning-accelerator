@@ -39,35 +39,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// Data directories - try multiple locations
-let STATIC_DIR, RUNTIME_DIR;
-
-// Check possible locations for data files
-const possibleDataDirs = [
-  path.join(__dirname, 'data', 'static'),
-  path.join(process.cwd(), 'data', 'static'),
-  path.join(__dirname, 'data'),
-];
-
-for (const dir of possibleDataDirs) {
-  console.log('Checking for data dir:', dir);
-  if (fs.existsSync(dir)) {
-    const testFile = path.join(dir, 'lesson-content.json');
-    if (fs.existsSync(testFile)) {
-      STATIC_DIR = dir;
-      console.log('✅ Found static dir:', STATIC_DIR);
-      break;
-    }
-  }
-}
-
-if (!STATIC_DIR) {
-  console.error('❌ CRITICAL: Could not find data/static directory');
-  STATIC_DIR = path.join(__dirname, 'data', 'static');
-  console.log('⚠️  Using fallback:', STATIC_DIR);
-}
-
-RUNTIME_DIR = path.join(__dirname, 'data', 'runtime');
+// Data directories - ALWAYS use data/static
+const STATIC_DIR = path.join(__dirname, 'data', 'static');
+const RUNTIME_DIR = path.join(__dirname, 'data', 'runtime');
 
 console.log('Static dir:', STATIC_DIR);
 console.log('Runtime dir:', RUNTIME_DIR);
