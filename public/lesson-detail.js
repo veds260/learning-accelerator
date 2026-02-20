@@ -814,6 +814,4 @@ window.nextStep = nextStep;
 window.completeLesson = completeLesson;
 window.answerQuestion = answerQuestion;
 window.runCode = runCode;
-window.showHint = showHint;
-window.skipToCode = skipToCode;
 window.nextLesson = nextLesson;
