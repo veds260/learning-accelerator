@@ -566,3 +566,12 @@ window.showDebugInfo = async function() {
   debugDiv.innerHTML = `<strong>?? localStorage:</strong><br>Completed: ${JSON.stringify(progress.completedLessons)}<br>XP: ${progress.xp}<br><br><strong>Next:</strong> ${lessons.find(l => !progress.completedLessons.includes(l.id))?.id || 'NONE'}`;
   debugDiv.style.display = 'block';
 };
+
+// Export functions for inline onclick handlers
+window.nextStep = nextStep;
+window.completeLesson = completeLesson;
+window.checkQuizAnswer = checkQuizAnswer;
+window.runCode = runCode;
+window.showHint = showHint;
+window.skipToCode = skipToCode;
+window.nextLesson = nextLesson;
