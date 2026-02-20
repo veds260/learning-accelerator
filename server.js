@@ -434,9 +434,12 @@ function loadAllLessons() {
   return allLessons;
 }
 
-// Lessons
+// Lessons - with optional limit for performance
 app.get('/api/lessons', async (req, res) => {
   try {
+    // Cache control - allow browser caching for lesson content (static)
+    res.set('Cache-Control', 'public, max-age=300'); // 5 minutes
+    
     const lessons = loadAllLessons();
     
     if (lessons.length === 0) {
@@ -446,8 +449,20 @@ app.get('/api/lessons', async (req, res) => {
       });
     }
     
-    console.log(`📚 Loaded ${lessons.length} total lessons`);
-    res.json(lessons);
+    // Optional limit for initial page load (performance on mobile)
+    const limit = req.query.limit ? parseInt(req.query.limit) : null;
+    const offset = req.query.offset ? parseInt(req.query.offset) : 0;
+    
+    let responseLessons = lessons;
+    if (limit) {
+      responseLessons = lessons.slice(offset, offset + limit);
+      console.log(`📚 Loaded ${responseLessons.length}/${lessons.length} lessons (limit=${limit}, offset=${offset})`);
+    } else {
+      console.log(`📚 Loaded ${lessons.length} total lessons`);
+    }
+    
+    // Include total count when limiting
+    res.json(limit ? { lessons: responseLessons, total: lessons.length } : responseLessons);
   } catch (error) {
     console.error('❌ ERROR in /api/lessons:');
     console.error('  Message:', error.message);

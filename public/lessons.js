@@ -49,18 +49,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-// Load lesson content
-async function loadLessonsData() {
+// Load lesson content (optimized for mobile - load only what's needed)
+async function loadLessonsData(loadAll = false) {
   try {
-    console.log('📚 Fetching lessons from /api/lessons...');
-    const response = await fetch('/api/lessons');
+    // Load only next 10 lessons initially for performance
+    // Load all when "View All Lessons" is clicked
+    const url = loadAll ? '/api/lessons' : '/api/lessons?limit=10';
+    
+    console.log('📚 Fetching lessons from', url);
+    const response = await fetch(url);
     console.log('📡 Response status:', response.status);
     
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
-    lessonsData = await response.json();
+    const data = await response.json();
+    
+    // Handle both formats: array (no limit) or object with lessons array (with limit)
+    if (Array.isArray(data)) {
+      lessonsData = data;
+    } else if (data.lessons && Array.isArray(data.lessons)) {
+      lessonsData = data.lessons;
+      console.log(`✅ Loaded ${data.lessons.length}/${data.total} lessons`);
+    } else {
+      throw new Error('Invalid response format');
+    }
+    
     console.log('✅ Loaded lessons:', lessonsData.length, 'lessons');
     
     if (lessonsData.length === 0) {
@@ -434,14 +449,37 @@ function setupEventListeners() {
     }
   });
   
-  // Toggle "View All Lessons"
+  // Toggle "View All Lessons" - loads all lessons on first click
   const toggleBtn = document.getElementById('toggle-all-lessons');
   if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
+    let allLessonsLoaded = false;
+    
+    toggleBtn.addEventListener('click', async () => {
       const pathSection = document.getElementById('lesson-path-section');
       const isHidden = pathSection.style.display === 'none';
       
       if (isHidden) {
+        // Load all lessons if not already loaded
+        if (!allLessonsLoaded) {
+          console.log('📚 Loading all lessons...');
+          toggleBtn.textContent = 'Loading...';
+          toggleBtn.disabled = true;
+          
+          try {
+            await loadLessonsData(true); // Load all lessons
+            allLessonsLoaded = true;
+            renderLessonPath(); // Re-render with all lessons
+          } catch (error) {
+            console.error('Failed to load all lessons:', error);
+            alert('Failed to load all lessons. Please try again.');
+            toggleBtn.disabled = false;
+            toggleBtn.textContent = 'View All Lessons';
+            return;
+          }
+          
+          toggleBtn.disabled = false;
+        }
+        
         pathSection.style.display = 'block';
         toggleBtn.textContent = 'Hide All Lessons';
       } else {
