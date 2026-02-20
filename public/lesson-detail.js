@@ -455,37 +455,37 @@ async function completeLesson() {
     console.log('📝 Completing lesson:', lessonId);
     
     // Load current progress from localStorage
-    const progress = loadLocalProgress();
+    const localProgress = loadLocalProgress();
     
-    // Check if already completed
-    if (progress.completedLessons.includes(lessonId)) {
-      console.log('⚠️ Lesson already completed');
-      // Still show completion screen
+    // Check if already completed locally
+    if (localProgress.completedLessons.includes(lessonId)) {
+      console.log('⚠️ Lesson already completed locally');
     } else {
-      // Mark as complete
-      progress.completedLessons.push(lessonId);
-      progress.xp = (progress.xp || 0) + 100;
-      progress.lastActive = new Date().toISOString();
+      // Mark as complete in localStorage
+      localProgress.completedLessons.push(lessonId);
+      localProgress.xp = (localProgress.xp || 0) + 100;
+      localProgress.lastActive = new Date().toISOString();
       
-      // Update streak
-      const today = new Date().toISOString().split('T')[0];
-      const lastActiveDate = progress.lastActive ? progress.lastActive.split('T')[0] : null;
+      // Save to localStorage immediately
+      saveLocalProgress(localProgress);
+      console.log('✅ Saved to localStorage:', localProgress);
+    }
+    
+    // ALSO save to server (persistent backup)
+    try {
+      const response = await fetch(`${API_BASE}/api/lessons/${lessonId}/complete`, {
+        method: 'POST'
+      });
       
-      if (!lastActiveDate || lastActiveDate !== today) {
-        const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-        if (lastActiveDate === yesterday) {
-          progress.streak = (progress.streak || 0) + 1;
-        } else {
-          progress.streak = 1;
-        }
+      if (response.ok) {
+        const serverResult = await response.json();
+        console.log('✅ Saved to server:', serverResult);
+      } else {
+        console.warn('⚠️ Server save failed, but localStorage worked');
       }
-      
-      // Save to localStorage
-      saveLocalProgress(progress);
-      
-      console.log('✅ Lesson completed successfully');
-      console.log('Total XP:', progress.xp);
-      console.log('Completed lessons:', progress.completedLessons);
+    } catch (serverError) {
+      console.warn('⚠️ Server save failed:', serverError.message);
+      console.log('📱 Progress saved locally, will sync when server is available');
     }
     
     // Show completion step
