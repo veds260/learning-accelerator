@@ -163,7 +163,7 @@ function renderNextLessonCard() {
     <span class="next-lesson-emoji">${nextLesson.emoji}</span>
     <h3 class="next-lesson-title">${nextLesson.title}</h3>
     <p class="next-lesson-subtitle">${nextLesson.subtitle}</p>
-    <button class="next-lesson-cta" onclick="window.location.href='lesson-detail.html?id=${nextLesson.id}')">
+    <button class="next-lesson-cta" onclick="window.location.href='lesson-detail.html?id=${nextLesson.id}'">
       Start Learning →
     </button>
   `;
