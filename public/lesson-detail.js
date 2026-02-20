@@ -660,6 +660,17 @@ async function completeLesson() {
       `;
     }
     
+    // Update debug display to show progress was saved
+    console.log('🎉 Lesson complete! Progress saved.');
+    console.log('Updated progress:', localProgress);
+    
+    // Auto-show debug info on completion screen
+    setTimeout(() => {
+      if (typeof showDebugInfo === 'function') {
+        showDebugInfo();
+      }
+    }, 500);
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (error) {
     console.error('❌ Failed to complete lesson:', error);
@@ -679,8 +690,12 @@ async function nextLesson() {
     console.log('✓ Completed lessons:', progress.completedLessons);
     console.log('✓ Current lesson that was just completed:', lessonId);
     
+    // Fetch ALL lessons (no limit) for next lesson navigation
     const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
-    const lessons = await lessonsResponse.json();
+    const lessonsData = await lessonsResponse.json();
+    
+    // Handle both response formats: array or {lessons, total}
+    const lessons = Array.isArray(lessonsData) ? lessonsData : lessonsData.lessons;
     
     console.log('📚 Total lessons available:', lessons.length);
     console.log('📋 All lesson IDs:', lessons.map(l => l.id).join(', '));
