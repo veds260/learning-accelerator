@@ -40,10 +40,35 @@ function loadLocalProgress() {
 
 function saveLocalProgress(progress) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-    console.log('✅ Progress saved locally:', progress);
+    console.log('💾 Attempting to save to localStorage...');
+    console.log('Storage key:', STORAGE_KEY);
+    console.log('Data to save:', progress);
+    
+    const jsonString = JSON.stringify(progress);
+    console.log('JSON string:', jsonString);
+    
+    localStorage.setItem(STORAGE_KEY, jsonString);
+    console.log('✅ localStorage.setItem completed');
+    
+    // Verify immediately
+    const readBack = localStorage.getItem(STORAGE_KEY);
+    console.log('🔍 Read back from localStorage:', readBack);
+    
+    if (readBack === jsonString) {
+      console.log('✅ Progress saved and verified successfully!');
+      return true;
+    } else {
+      console.error('❌ Verification failed - data mismatch!');
+      console.error('Expected:', jsonString);
+      console.error('Got:', readBack);
+      return false;
+    }
   } catch (error) {
     console.error('❌ Failed to save progress:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    alert('Failed to save progress: ' + error.message + '\n\nPlease check if localStorage is enabled in your browser.');
+    return false;
   }
 }
 
@@ -56,6 +81,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   log('🚀 INITIALIZATION START');
   log('Lesson ID from URL:', lessonId);
   log('API Base:', API_BASE);
+  
+  // Check localStorage availability
+  try {
+    const testKey = '_test_storage';
+    localStorage.setItem(testKey, 'test');
+    const testValue = localStorage.getItem(testKey);
+    localStorage.removeItem(testKey);
+    
+    if (testValue === 'test') {
+      log('✅ localStorage is available and working');
+    } else {
+      log('❌ localStorage test failed - storage might be disabled');
+      alert('WARNING: Browser storage is not working properly. Progress may not save.\n\nPlease:\n1. Exit private/incognito mode\n2. Enable cookies and site data\n3. Check browser settings');
+    }
+  } catch (e) {
+    log('❌ localStorage error:', e.message);
+    alert('ERROR: localStorage is blocked.\n\n' + e.message + '\n\nPlease enable browser storage to save progress.');
+  }
   
   if (!lessonId) {
     log('❌ No lesson ID found in URL');
@@ -664,12 +707,27 @@ async function completeLesson() {
     console.log('🎉 Lesson complete! Progress saved.');
     console.log('Updated progress:', localProgress);
     
-    // Auto-show debug info on completion screen
-    setTimeout(() => {
-      if (typeof showDebugInfo === 'function') {
-        showDebugInfo();
-      }
-    }, 500);
+    // Verify save worked by reading back
+    const verifyProgress = loadLocalProgress();
+    console.log('🔍 Verification read from localStorage:', verifyProgress);
+    
+    if (verifyProgress.completedLessons.includes(lessonId)) {
+      console.log('✅ VERIFIED: Progress saved successfully!');
+    } else {
+      console.error('❌ VERIFICATION FAILED: Progress did not save!');
+      console.error('localStorage available?', typeof localStorage !== 'undefined');
+      console.error('Storage quota?', navigator.storage ? 'checking...' : 'unavailable');
+    }
+    
+    // Show progress immediately on completion screen
+    const debugDiv = document.getElementById('debug-progress');
+    if (debugDiv) {
+      debugDiv.innerHTML = '<strong>Progress Debug:</strong><br>' +
+        'Completed: ' + JSON.stringify(localProgress.completedLessons) + '<br>' +
+        'XP: ' + localProgress.xp + '<br>' +
+        'Verified: ' + (verifyProgress.completedLessons.includes(lessonId) ? '✅ YES' : '❌ NO');
+      debugDiv.style.display = 'block';
+    }
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
   } catch (error) {
