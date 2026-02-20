@@ -14,6 +14,76 @@ let currentHintIndex = 0;
 
 const STORAGE_KEY = 'learning-accelerator-progress';
 
+// ── Library glossary ──────────────────────────────────────────────────────────
+// Plain-English explanations for every library / function a student might hit.
+const LIBRARY_GLOSSARY = {
+  re: {
+    label: 're',
+    what: "Python's text-search tool. You describe a pattern and it scans your string for matches.",
+    fns: {
+      'findall':  'Returns a list of every match — use this when you want all results.',
+      'search':   'Finds the first match only. Returns None if nothing matched.',
+      'match':    'Checks if the pattern matches at the very start of the string.',
+      'sub':      'Replaces every match with a different string (like find-and-replace).',
+      'compile':  'Saves a pattern so you can reuse it without rewriting the pattern string.',
+    }
+  },
+  Counter: {
+    label: 'Counter (from collections)',
+    what: "A special dictionary that counts how many times each item appears in a list.",
+    fns: {
+      'most_common': 'Returns items sorted from most frequent to least.',
+    }
+  },
+  torch: {
+    label: 'torch (PyTorch)',
+    what: "The core PyTorch library for building and running neural networks.",
+    fns: {
+      'tensor':  'Creates a multi-dimensional number array (a "tensor") from a Python list.',
+      'zeros':   'Creates a tensor filled entirely with zeros.',
+      'ones':    'Creates a tensor filled entirely with ones.',
+      'randn':   'Creates a tensor filled with small random numbers.',
+      'matmul':  'Multiplies two tensors together (matrix multiplication).',
+    }
+  },
+  nn: {
+    label: 'torch.nn',
+    what: "PyTorch's collection of neural network building blocks — layers, activations, and more.",
+    fns: {
+      'Embedding':  'A lookup table: given a token ID (number), it returns a fixed-size vector of numbers that represents that token.',
+      'Linear':     'A fully-connected layer — multiplies inputs by learned weights and adds a bias.',
+      'ReLU':       'An activation function that turns negative numbers into zero.',
+      'Softmax':    'Squishes a list of numbers into probabilities that add up to 1.',
+      'Sequential': 'Chains layers in order — input flows through each one.',
+      'Module':     'The base class every custom neural network inherits from.',
+    }
+  },
+  math: {
+    label: 'math',
+    what: "Python's built-in math tools — logarithms, square roots, trig, etc.",
+    fns: {
+      'log':   'Natural logarithm (base e). Use math.log2() for base-2 log.',
+      'sqrt':  'Square root.',
+      'exp':   'e raised to the power of x.',
+      'floor': 'Rounds a number down to the nearest integer.',
+      'ceil':  'Rounds a number up to the nearest integer.',
+    }
+  },
+  numpy: {
+    label: 'numpy (np)',
+    what: "Fast arrays and math operations — the backbone of most data science in Python.",
+    fns: {
+      'array':    'Creates an ndarray from a Python list.',
+      'zeros':    'Array filled with zeros.',
+      'ones':     'Array filled with ones.',
+      'dot':      'Dot product of two arrays.',
+      'reshape':  'Changes the shape of an array without changing its data.',
+      'mean':     'Average value.',
+      'sum':      'Total of all values.',
+    }
+  },
+};
+
 // ── Progress helpers ─────────────────────────────────────────────────────────
 function loadLocalProgress() {
   try {
@@ -307,6 +377,82 @@ function showQuizResults(total) {
   setTimeout(() => nextStep(), 2000);
 }
 
+// ── Library detection ─────────────────────────────────────────────────────────
+// Parses import lines from starter code and returns matching glossary entries.
+function detectLibraries(starterCode) {
+  const detected = [];
+  const seen = new Set();
+
+  const lines = starterCode.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    // "import re", "import torch", "import numpy as np", "import math"
+    const simpleMatch = trimmed.match(/^import\s+([\w.]+)(?:\s+as\s+\w+)?/);
+    if (simpleMatch) {
+      const mod = simpleMatch[1].split('.')[0];  // torch.nn → torch
+      if (LIBRARY_GLOSSARY[mod] && !seen.has(mod)) {
+        detected.push({ key: mod, ...LIBRARY_GLOSSARY[mod] });
+        seen.add(mod);
+      }
+    }
+
+    // "from collections import Counter", "from torch.nn import ..."
+    const fromMatch = trimmed.match(/^from\s+[\w.]+\s+import\s+(\w+)/);
+    if (fromMatch) {
+      const name = fromMatch[1];
+      if (LIBRARY_GLOSSARY[name] && !seen.has(name)) {
+        detected.push({ key: name, ...LIBRARY_GLOSSARY[name] });
+        seen.add(name);
+      }
+    }
+
+    // "import torch.nn as nn" — also add nn entry
+    if (trimmed.includes('torch.nn') && !seen.has('nn')) {
+      detected.push({ key: 'nn', ...LIBRARY_GLOSSARY['nn'] });
+      seen.add('nn');
+    }
+  }
+  return detected;
+}
+
+// Renders a collapsible "What you'll use" panel inside the instructions panel.
+function renderLibraryPanel(libraries, container) {
+  if (!libraries.length) return;
+
+  const items = libraries.map(lib => {
+    const fnRows = Object.entries(lib.fns || {})
+      .map(([fn, desc]) => `
+        <div class="lib-fn-row">
+          <code class="lib-fn-name">${lib.key === 'Counter' ? fn : lib.key + '.' + fn}()</code>
+          <span class="lib-fn-desc">${desc}</span>
+        </div>`)
+      .join('');
+
+    return `
+      <div class="lib-entry">
+        <div class="lib-entry-header">
+          <span class="lib-badge">${lib.label}</span>
+          <span class="lib-what">${lib.what}</span>
+        </div>
+        ${fnRows ? `<div class="lib-fns">${fnRows}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  const panel = document.createElement('div');
+  panel.className = 'library-panel';
+  panel.innerHTML = `
+    <details class="library-details">
+      <summary class="library-summary">
+        <span class="lib-icon">📦</span>
+        New to this exercise
+      </summary>
+      <div class="library-body">${items}</div>
+    </details>`;
+
+  container.appendChild(panel);
+}
+
 // ── Code Exercise ─────────────────────────────────────────────────────────────
 function renderCodeExercise() {
   if (!codeExercises || !codeExercises.length) {
@@ -319,6 +465,13 @@ function renderCodeExercise() {
   currentExercise = exercise;
   const instrEl = document.getElementById('code-instructions');
   if (instrEl) instrEl.textContent = exercise.instructions;
+
+  // Library awareness panel
+  const instrPanel = document.querySelector('.instructions-panel');
+  if (instrPanel) {
+    const libs = detectLibraries(exercise.starterCode || '');
+    renderLibraryPanel(libs, instrPanel);
+  }
 
   const isMobile = window.innerWidth < 768;
 
@@ -510,10 +663,24 @@ function explainPythonError(msg) {
     // ── Typo in function name (e.g. re.finall) ────────────────────────────
     {
       match: /module '(.+?)' has no attribute '(.+?)'/,
-      explain: (m) => ({
-        title: 'Function name typo',
-        body: `\`${m[1]}.${m[2]}\` doesn't exist — looks like a typo.\n\nPython is case-sensitive and spelling matters exactly. Double-check the function name in the \`${m[1]}\` docs. For example, \`re.findall\` not \`re.finall\`.`
-      })
+      explain: (m) => {
+        const mod  = m[1];
+        const fn   = m[2];
+        const entry = LIBRARY_GLOSSARY[mod];
+        // Find the closest real function name in the glossary
+        const available = entry ? Object.keys(entry.fns || {}) : [];
+        const closest = available.find(f => f.toLowerCase().startsWith(fn.slice(0, 4).toLowerCase()));
+        let hint = `\`${mod}.${fn}\` doesn't exist — check the spelling.`;
+        if (closest) {
+          hint += ` Did you mean \`${mod}.${closest}()\`?\n\n${mod}.${closest}() — ${entry.fns[closest]}`;
+        } else if (entry) {
+          const fnList = available.map(f => `\`${mod}.${f}()\``).join(', ');
+          hint += `\n\n${mod} is ${entry.what}\n\nFunctions you can use: ${fnList}`;
+        } else {
+          hint += `\n\nPython is case-sensitive. Double-check the function name.`;
+        }
+        return { title: 'Function name typo', body: hint };
+      }
     },
     // ── Object has no attribute ───────────────────────────────────────────
     {
