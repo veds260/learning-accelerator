@@ -3,97 +3,99 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lessons - Learning Accelerator</title>
+  <title>Lessons · Learning Accelerator</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="lessons.css">
 </head>
 <body>
-  <!-- Navigation -->
+
   <nav class="nav">
-    <div class="nav-brand">
-      <span class="logo">💎</span>
-      <span class="brand-text">Learning Accelerator</span>
-    </div>
+    <a href="index.html" class="nav-brand">
+      <span class="logo">⚡</span>
+      Learning Accelerator
+    </a>
     <div class="nav-menu">
       <a href="index.html" class="nav-link">Dashboard</a>
       <a href="lessons.html" class="nav-link active">Lessons</a>
-      <a href="code-playground.html" class="nav-link">Code Playground</a>
+      <a href="code-playground.html" class="nav-link">Playground</a>
     </div>
   </nav>
 
-  <!-- Main Container -->
-  <div class="container lessons-view">
-    
-    <!-- Loading State -->
+  <div class="lessons-container">
+
+    <!-- Loading -->
     <div id="loading" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading...</p>
+      <p>Loading your journey...</p>
     </div>
 
-    <!-- Lessons List View (Simplified) -->
-    <div id="lessons-list" class="view" style="display: none;">
-      <div class="hero">
-        <h1>🎓 Your Learning Journey</h1>
-        <p class="subtitle">Master the foundations through story-driven lessons</p>
+    <!-- Main content -->
+    <div id="lessons-content" style="display:none;">
+
+      <!-- Hero -->
+      <div class="lessons-hero reveal">
+        <h1>Your Learning Path</h1>
+        <p class="hero-sub">Master LLM foundations — one story-driven lesson at a time.</p>
       </div>
 
-      <!-- Progress Overview (hidden initially) -->
-      <div class="progress-overview" id="progress-overview" style="display: none;">
-        <div class="level-badge">
-          <div class="level-number" id="current-level">1</div>
-          <div class="level-label">Current Level</div>
-        </div>
-        <div class="xp-progress">
-          <div class="xp-label">
-            <span id="lesson-xp">0</span> / <span id="lesson-xp-total">500</span> XP
+      <!-- Stats bar (shown after first lesson) -->
+      <div class="stats-bar reveal" id="stats-bar" style="display:none;">
+        <div class="stats-xp">
+          <div class="stats-xp-header">
+            <div class="stats-left">
+              <div class="level-badge" id="level-badge">Lv 1</div>
+              <div class="xp-numbers">
+                <span id="xp-current">0</span>
+                <span class="xp-sep">/</span>
+                <span id="xp-total">500</span>
+                <span class="xp-unit">XP</span>
+              </div>
+            </div>
+            <div class="streak-pill" id="streak-pill" style="display:none;">
+              🔥 <span id="streak-count">0</span> day streak
+            </div>
           </div>
-          <div class="xp-bar">
-            <div class="xp-fill" id="lesson-xp-fill" style="width: 0%"></div>
+          <div class="xp-bar-track">
+            <div class="xp-bar-fill" id="xp-bar-fill" style="width:0%"></div>
           </div>
         </div>
-        <div class="streak-display" id="streak-display" style="display: none;">
-          <span class="streak-icon">🔥</span>
-          <span class="streak-number" id="lesson-streak">0</span>
-          <span class="streak-label">day streak</span>
-        </div>
       </div>
 
-      <!-- What's Next Section -->
-      <div class="whats-next-section">
-        <h2>📍 What's Next?</h2>
-        <div class="next-lesson-card" id="next-lesson-card">
-          <!-- Populated by JS -->
-        </div>
-      </div>
+      <!-- Next up -->
+      <section class="section reveal">
+        <div class="section-label">Up Next</div>
+        <div id="next-lesson-card" class="next-card"></div>
+      </section>
 
-      <!-- Completed Lessons (hidden initially) -->
-      <div class="completed-section" id="completed-section" style="display: none;">
-        <h2>✅ Completed</h2>
+      <!-- Completed lessons -->
+      <section class="section reveal" id="completed-section" style="display:none;">
+        <div class="section-label">Completed</div>
         <div id="completed-list"></div>
+      </section>
+
+      <!-- All lessons toggle -->
+      <div class="all-toggle reveal">
+        <button class="btn-toggle" id="toggle-all-lessons">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 5l5 5 5-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          View full lesson path
+        </button>
       </div>
 
-      <!-- View All Lessons Toggle -->
-      <div class="view-all-section" style="text-align: center; margin-top: 2rem;">
-        <button class="btn-link" id="toggle-all-lessons">View All Lessons</button>
-      </div>
+      <!-- Lesson path (collapsible) -->
+      <section id="lesson-path-section" class="section" style="display:none;">
+        <div class="section-label">All Lessons</div>
+        <div id="lesson-path" class="lesson-path"></div>
+      </section>
 
-      <!-- Lesson Path (collapsed initially) -->
-      <div class="lesson-path-section" id="lesson-path-section" style="display: none;">
-        <h2>🗺️ All Lessons</h2>
-        <div class="lesson-path" id="lesson-path">
-          <!-- Populated by JS -->
-        </div>
-      </div>
+      <!-- Achievements -->
+      <section class="section reveal" id="achievements-section" style="display:none;">
+        <div class="section-label">Achievements</div>
+        <div id="achievement-grid" class="achievement-grid"></div>
+      </section>
 
-      <!-- Achievements (hidden initially) -->
-      <div class="achievements-preview" id="achievements-preview" style="display: none;">
-        <h2>🏆 Achievements</h2>
-        <div class="achievement-grid" id="achievement-grid">
-          <!-- Populated by JS -->
-        </div>
-      </div>
-    </div>
-
+    </div><!-- /lessons-content -->
   </div>
 
   <script src="lessons.js"></script>

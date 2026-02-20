@@ -3,155 +3,168 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Learning Accelerator - Manning LLM Course</title>
+  <title>Learning Accelerator · Manning LLM Course</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
-  <!-- Navigation -->
+
   <nav class="nav">
-    <div class="nav-brand">
-      <span class="logo">💎</span>
-      <span class="brand-text">Learning Accelerator</span>
-    </div>
+    <a href="index.html" class="nav-brand">
+      <span class="logo">⚡</span>
+      Learning Accelerator
+    </a>
     <div class="nav-menu">
-      <a href="#" class="nav-link active" data-view="dashboard">Dashboard</a>
-      <a href="lessons.html" class="nav-link">Lessons</a>
-      <a href="code-playground.html" class="nav-link">Code Playground</a>
+      <a href="index.html"         class="nav-link active">Dashboard</a>
+      <a href="lessons.html"       class="nav-link">Lessons</a>
+      <a href="code-playground.html" class="nav-link">Playground</a>
     </div>
   </nav>
 
-  <!-- Main Container -->
   <div class="container">
-    
-    <!-- Dashboard View -->
-    <div id="dashboard" class="view active">
-      <div class="hero">
-        <h1>Learn to Build Language Models</h1>
-        <p class="subtitle">Story-driven Python lessons that stick</p>
-      </div>
 
-      <!-- Simple Stats (initially hidden for new users) -->
-      <div class="stats-grid" id="stats-section" style="display: none;">
-        <div class="stat-card">
-          <div class="stat-icon">📚</div>
-          <div class="stat-value" id="lessons-completed">0/5</div>
-          <div class="stat-label">Lessons Completed</div>
-        </div>
-        
-        <div class="stat-card" id="xp-card" style="display: none;">
-          <div class="stat-icon">⚡</div>
-          <div class="stat-value" id="xp-value">0</div>
-          <div class="stat-label">Total XP</div>
+    <!-- Hero -->
+    <div class="hero reveal">
+      <h1>Build Language Models</h1>
+      <p class="subtitle">Story-driven Python lessons. No fluff, just understanding.</p>
+    </div>
+
+    <!-- Stats (shown after first lesson) -->
+    <div class="dash-stats reveal" id="stats-section" style="display:none;">
+      <div class="stat-tile">
+        <span class="stat-tile-icon">📚</span>
+        <div>
+          <div class="stat-tile-value" id="lessons-completed">0</div>
+          <div class="stat-tile-label">Lessons done</div>
         </div>
       </div>
-
-      <!-- Main Actions -->
-      <div class="section">
-        <h2 id="whats-next-heading">What's Next</h2>
-        <div class="actions-grid">
-          <button class="action-btn primary" onclick="window.location.href='lessons.html'">
-            <span class="btn-icon">🧩</span>
-            <div class="btn-content">
-              <div class="btn-title" id="next-lesson-title">The Language Puzzle</div>
-              <div class="btn-subtitle" id="next-lesson-subtitle">How do computers read text?</div>
-              <div class="btn-meta">~10 minutes</div>
-            </div>
-          </button>
-          
-          <button class="action-btn" onclick="window.location.href='code-playground.html'">
-            <span class="btn-icon">💻</span>
-            <div class="btn-content">
-              <div class="btn-title">Code Playground</div>
-              <div class="btn-subtitle">Practice Python</div>
-            </div>
-          </button>
+      <div class="stat-tile" id="xp-tile" style="display:none;">
+        <span class="stat-tile-icon">⚡</span>
+        <div>
+          <div class="stat-tile-value" id="xp-value">0</div>
+          <div class="stat-tile-label">XP earned</div>
         </div>
-      </div>
-
-      <!-- Recent Progress (initially hidden) -->
-      <div class="section" id="progress-section" style="display: none;">
-        <h2>Recently Completed</h2>
-        <div id="completed-lessons-list"></div>
       </div>
     </div>
+
+    <!-- Next action -->
+    <section class="section reveal">
+      <div class="section-label" id="action-label">Start Learning</div>
+      <div class="cta-card" id="cta-card" onclick="window.location.href='lessons.html'">
+        <div class="cta-card-inner">
+          <div class="cta-emoji" id="cta-emoji">🧩</div>
+          <div class="cta-text">
+            <div class="cta-title" id="cta-title">The Language Puzzle</div>
+            <div class="cta-sub" id="cta-sub">How do computers read text?</div>
+            <div class="cta-meta">~10 min · +100 XP</div>
+          </div>
+          <div class="cta-arrow">→</div>
+        </div>
+      </div>
+
+      <div class="secondary-actions">
+        <a href="code-playground.html" class="action-tile">
+          <span>💻</span>
+          <div>
+            <div class="action-tile-title">Code Playground</div>
+            <div class="action-tile-sub">Free-form Python</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- Recent completions (shown after first lesson) -->
+    <section class="section reveal" id="recent-section" style="display:none;">
+      <div class="section-label">Recently Completed</div>
+      <div id="recent-list"></div>
+    </section>
 
   </div>
 
   <script>
-    // Simple dashboard logic
-    const API_BASE = window.location.origin;
+    const STORAGE_KEY = 'learning-accelerator-progress';
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadDashboard();
-    });
+    function loadLocalProgress() {
+      try {
+        const s = localStorage.getItem(STORAGE_KEY);
+        return s ? JSON.parse(s) : { completedLessons: [], xp: 0 };
+      } catch { return { completedLessons: [], xp: 0 }; }
+    }
+
+    // Scroll reveal
+    function setupReveal() {
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+    }
 
     async function loadDashboard() {
+      const progress = loadLocalProgress();
+      const completed = progress.completedLessons || [];
+      const xp        = progress.xp || 0;
+
       try {
-        console.log('Loading dashboard data...');
-        
-        // Load progress
-        const progressRes = await fetch(`${API_BASE}/api/progress`);
-        if (!progressRes.ok) {
-          throw new Error(`Progress API failed: ${progressRes.status}`);
-        }
-        const progress = await progressRes.json();
-        
-        // Load lessons
-        const lessonsRes = await fetch(`${API_BASE}/api/lessons`);
-        if (!lessonsRes.ok) {
-          throw new Error(`Lessons API failed: ${lessonsRes.status}`);
-        }
-        const lessons = await lessonsRes.json();
-        
-        console.log('Progress:', progress);
-        console.log('Lessons:', lessons);
-        
-        const completedLessons = progress.completedLessons || [];
-        const completedCount = completedLessons.length;
-        
-        // Progressive disclosure: show stats only after first lesson
-        if (completedCount > 0) {
-          document.getElementById('stats-section').style.display = 'grid';
-          document.getElementById('lessons-completed').textContent = `${completedCount}/${lessons.length}`;
-          
-          // Show XP after 1st lesson (celebration!)
-          if (progress.xp > 0) {
-            document.getElementById('xp-card').style.display = 'block';
-            document.getElementById('xp-value').textContent = progress.xp;
+        const res     = await fetch('/api/lessons');
+        const data    = await res.json();
+        const lessons = Array.isArray(data) ? data : (data.lessons || []);
+
+        // Show stats after first lesson
+        if (completed.length > 0) {
+          document.getElementById('stats-section').style.display = 'flex';
+          document.getElementById('lessons-completed').textContent =
+            `${completed.length}/${lessons.length}`;
+
+          if (xp > 0) {
+            document.getElementById('xp-tile').style.display  = 'flex';
+            document.getElementById('xp-value').textContent   = xp;
           }
-          
-          // Show progress section
-          document.getElementById('progress-section').style.display = 'block';
-          const completedList = lessons
-            .filter(l => completedLessons.includes(l.id))
-            .map(l => `<div class="completed-lesson">✅ ${l.title}</div>`)
-            .join('');
-          document.getElementById('completed-lessons-list').innerHTML = completedList;
+
+          // Recent completions
+          const recent = lessons.filter(l => completed.includes(l.id));
+          if (recent.length > 0) {
+            document.getElementById('recent-section').style.display = 'block';
+            document.getElementById('recent-list').innerHTML = recent.map(l => `
+              <div class="completed-lesson" onclick="window.location.href='lesson-detail.html?id=${l.id}'">
+                <span>${l.emoji || '📖'}</span>
+                ${l.title}
+                <span style="margin-left:auto; color:var(--success); font-size:0.85rem;">✓</span>
+              </div>`).join('');
+          }
+
+          document.getElementById('action-label').textContent = 'Continue Learning';
         }
-        
-        // Find next lesson
-        const nextLesson = lessons.find(l => !completedLessons.includes(l.id));
-        
-        if (nextLesson) {
-          document.getElementById('next-lesson-title').textContent = nextLesson.title;
-          document.getElementById('next-lesson-subtitle').textContent = nextLesson.subtitle;
-          document.getElementById('whats-next-heading').textContent = completedCount > 0 ? "Continue Learning" : "Start Learning";
+
+        // Next lesson
+        const next = lessons.find(l => !completed.includes(l.id));
+        if (next) {
+          document.getElementById('cta-emoji').textContent = next.emoji || '📖';
+          document.getElementById('cta-title').textContent = next.title;
+          document.getElementById('cta-sub').textContent   = next.subtitle || '';
+          document.getElementById('cta-card').onclick = () =>
+            window.location.href = `lesson-detail.html?id=${next.id}`;
         } else {
-          document.getElementById('next-lesson-title').textContent = 'All lessons complete!';
-          document.getElementById('next-lesson-subtitle').textContent = 'You finished the course 🎉';
-          document.querySelector('.btn-meta').textContent = '';
+          document.getElementById('cta-emoji').textContent = '🎉';
+          document.getElementById('cta-title').textContent = 'All lessons complete!';
+          document.getElementById('cta-sub').textContent   = 'You finished the full foundation.';
+          document.querySelector('.cta-meta').textContent  = '';
+          document.getElementById('cta-card').style.cursor = 'default';
+          document.getElementById('cta-card').onclick      = null;
         }
-        
-        console.log('✅ Dashboard loaded successfully');
-        
-      } catch (error) {
-        console.error('❌ Dashboard load error:', error);
-        // Show user-friendly error
-        document.querySelector('.hero h1').textContent = 'Error loading dashboard';
-        document.querySelector('.hero .subtitle').textContent = error.message;
+      } catch (err) {
+        console.warn('Dashboard API error:', err);
+        // Dashboard still works with localStorage; just skip lesson title update
       }
+
+      setupReveal();
     }
+
+    document.addEventListener('DOMContentLoaded', loadDashboard);
   </script>
 </body>
 </html>

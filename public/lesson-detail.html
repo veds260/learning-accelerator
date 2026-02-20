@@ -3,173 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lesson - Learning Accelerator</title>
+  <title>Lesson · Learning Accelerator</title>
   <link rel="stylesheet" href="lesson-detail.css">
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-  
-  <!-- Monaco Editor -->
-  <link rel="stylesheet" data-name="vs/editor/editor.main" href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
-  
-  <!-- Pyodide -->
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+  <link rel="stylesheet" data-name="vs/editor/editor.main"
+        href="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/editor/editor.main.min.css">
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js" defer></script>
 </head>
 <body>
-  <nav class="nav">
-    <div class="nav-brand">
-      <span class="logo">💎</span>
-      <span class="brand-text">Learning Accelerator</span>
-    </div>
-    <div class="nav-menu">
-      <a href="index.html" class="nav-link">Dashboard</a>
-      <a href="lessons.html" class="nav-link active">Lessons</a>
-      <a href="code-playground.html" class="nav-link">Code Playground</a>
+
+  <!-- Nav -->
+  <nav class="lesson-nav">
+    <a href="lessons.html" class="nav-back">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Lessons
+    </a>
+    <span class="nav-title" id="nav-lesson-title">Loading...</span>
+    <div class="nav-xp" id="nav-xp">
+      <span class="xp-bolt">⚡</span>
+      <span id="nav-xp-value">0</span>
     </div>
   </nav>
 
-  <div class="container">
-    <!-- Lesson Header -->
-    <div class="lesson-header">
-      <button onclick="window.location.href='lessons.html'" class="btn-back">← Back to Lessons</button>
-      <div id="lesson-title-section">
-        <h1 id="lesson-title">Loading...</h1>
-        <p id="lesson-subtitle"></p>
+  <!-- Step progress bar -->
+  <div class="progress-track">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    <div class="step-dots">
+      <div class="step-dot active" id="dot-1">
+        <div class="dot-circle">1</div>
+        <span class="dot-label">Learn</span>
       </div>
-    </div>
-
-    <!-- Progress Bar -->
-    <div class="lesson-progress-bar">
-      <div class="progress-step active" data-step="1">
-        <div class="step-number">1</div>
-        <div class="step-label">Learn</div>
+      <div class="step-dot" id="dot-2">
+        <div class="dot-circle">2</div>
+        <span class="dot-label">Quiz</span>
       </div>
-      <div class="progress-step" data-step="2">
-        <div class="step-number">2</div>
-        <div class="step-label">Quiz</div>
+      <div class="step-dot" id="dot-3">
+        <div class="dot-circle">3</div>
+        <span class="dot-label">Code</span>
       </div>
-      <div class="progress-step" data-step="3">
-        <div class="step-number">3</div>
-        <div class="step-label">Code</div>
-      </div>
-      <div class="progress-step" data-step="4">
-        <div class="step-number">4</div>
-        <div class="step-label">Complete</div>
-      </div>
-    </div>
-
-    <!-- Step 1: Learn Content -->
-    <div id="step-learn" class="lesson-step active">
-      <div class="lesson-content">
-        <div id="story-section" class="content-section">
-          <h2>📖 Story</h2>
-          <div id="story-text"></div>
-        </div>
-
-        <div id="concept-section" class="content-section">
-          <h2>💡 Core Concept</h2>
-          <div id="concept-text"></div>
-        </div>
-
-        <div id="analogy-section" class="content-section">
-          <h2>🎯 Analogy</h2>
-          <div id="analogy-text"></div>
-        </div>
-
-        <div id="visual-section" class="content-section">
-          <h2>📊 Visual</h2>
-          <pre id="visual-diagram"></pre>
-        </div>
-
-        <div id="keypoints-section" class="content-section">
-          <h2>🔑 Key Points</h2>
-          <ul id="keypoints-list"></ul>
-        </div>
-
-        <div id="realworld-section" class="content-section">
-          <h2>🌍 Real-World Applications</h2>
-          <ul id="realworld-list"></ul>
-        </div>
-
-        <div id="easteregg-section" class="content-section">
-          <h2>🥚 Easter Egg</h2>
-          <div id="easteregg-text"></div>
-        </div>
-      </div>
-
-      <div class="step-actions">
-        <button class="btn primary large" onclick="nextStep()">Continue to Quiz →</button>
-      </div>
-    </div>
-
-    <!-- Step 2: Quiz -->
-    <div id="step-quiz" class="lesson-step">
-      <h2>📝 Test Your Knowledge</h2>
-      <div id="quiz-container">
-        <!-- Quiz questions loaded here -->
-        <!-- Auto-advances after completion -->
-      </div>
-    </div>
-
-    <!-- Step 3: Code Exercise -->
-    <div id="step-code" class="lesson-step">
-      <h2>💻 Hands-On Coding</h2>
-      
-      <div class="code-exercise-container">
-        <div class="instructions-panel">
-          <h3>📝 Instructions</h3>
-          <p id="code-instructions"></p>
-          
-          <div id="hints-section" style="margin-top: 1rem;">
-            <button id="show-hint-btn" class="btn secondary">💡 Show Hint</button>
-            <div id="hint-display" style="display: none; margin-top: 0.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px;"></div>
-          </div>
-        </div>
-        
-        <div class="editor-panel">
-          <div class="editor-header">
-            <span class="editor-label">🐍 Python</span>
-            <div class="editor-controls">
-              <button id="reset-code-btn" class="btn secondary btn-sm">↺ Reset</button>
-              <button id="run-code-btn" class="btn primary btn-sm">▶ Run Code</button>
-            </div>
-          </div>
-          
-          <div id="code-editor" style="height: 400px; border: 1px solid var(--border);"></div>
-          
-          <div class="console-panel">
-            <div class="console-header">
-              <span>Console Output</span>
-              <button id="clear-console-btn" class="btn-clear">Clear</button>
-            </div>
-            <div id="console-output"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="step-actions">
-        <button class="btn primary large" onclick="completeLesson()">Complete Lesson →</button>
-        <button class="btn secondary" onclick="if(confirm('Skip coding exercise? You can always come back later.')) completeLesson()">Skip Exercise →</button>
-      </div>
-    </div>
-
-    <!-- Step 4: Completion -->
-    <div id="step-complete" class="lesson-step">
-      <div class="completion-card">
-        <div class="completion-icon">🎉</div>
-        <h2>Lesson Complete!</h2>
-        <p>You've earned <strong>+100 XP</strong></p>
-        <div id="completion-badge"></div>
-        
-        <!-- Debug info -->
-        <div id="debug-progress" style="margin: 1rem 0; padding: 1rem; background: #1a1a1a; border-radius: 8px; text-align: left; font-size: 12px; font-family: monospace;"></div>
-        
-        <div class="completion-actions">
-          <button class="btn primary" onclick="window.location.href='lessons.html'">Back to Lessons</button>
-          <button class="btn secondary" onclick="nextLesson()">Next Lesson →</button>
-          <button class="btn secondary" onclick="showDebugInfo()" style="font-size: 11px;">Show Debug Info</button>
-        </div>
+      <div class="step-dot" id="dot-4">
+        <div class="dot-circle">✓</div>
+        <span class="dot-label">Done</span>
       </div>
     </div>
   </div>
+
+  <!-- Page wrapper -->
+  <div class="page-wrap">
+
+    <!-- ── Step 1: Learn ── -->
+    <div id="step-learn" class="lesson-step active">
+      <header class="lesson-hero">
+        <h1 id="lesson-title">Loading...</h1>
+        <p id="lesson-subtitle" class="lesson-sub"></p>
+      </header>
+
+      <div class="content-stack">
+        <div class="content-card" id="story-section">
+          <div class="card-tag">Story</div>
+          <div id="story-text" class="card-body"></div>
+        </div>
+
+        <div class="content-card" id="concept-section">
+          <div class="card-tag accent">Core Concept</div>
+          <div id="concept-text" class="card-body"></div>
+        </div>
+
+        <div class="content-card" id="analogy-section">
+          <div class="card-tag">Analogy</div>
+          <div id="analogy-text" class="card-body"></div>
+        </div>
+
+        <div class="content-card" id="visual-section">
+          <div class="card-tag">Visual</div>
+          <pre id="visual-diagram" class="visual-pre"></pre>
+        </div>
+
+        <div class="content-card" id="keypoints-section">
+          <div class="card-tag gold">Key Takeaways</div>
+          <ul id="keypoints-list" class="key-list"></ul>
+        </div>
+
+        <div class="content-card" id="realworld-section">
+          <div class="card-tag">Real World</div>
+          <ul id="realworld-list" class="key-list"></ul>
+        </div>
+
+        <div class="content-card easter" id="easteregg-section">
+          <div class="card-tag">Easter Egg 🥚</div>
+          <div id="easteregg-text" class="card-body easter-text"></div>
+        </div>
+      </div>
+
+      <div class="step-footer">
+        <button class="btn-cta" onclick="nextStep()">
+          Continue to Quiz
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Step 2: Quiz ── -->
+    <div id="step-quiz" class="lesson-step">
+      <header class="step-header">
+        <h2>Test Your Knowledge</h2>
+        <p class="step-desc">Answer each question — feedback shows right away.</p>
+      </header>
+      <div id="quiz-container"></div>
+    </div>
+
+    <!-- ── Step 3: Code ── -->
+    <div id="step-code" class="lesson-step">
+      <header class="step-header">
+        <h2>Hands-On Coding</h2>
+        <p class="step-desc">Write Python. Run it. See it work.</p>
+        <span class="lang-pill">🐍 Python + Pyodide</span>
+      </header>
+
+      <div class="code-layout">
+        <div class="instructions-panel">
+          <div class="panel-label">Instructions</div>
+          <p id="code-instructions" class="instructions-text"></p>
+          <div id="hints-section" style="margin-top: 1.25rem;">
+            <button id="show-hint-btn" class="btn-hint">💡 Show Hint</button>
+            <div id="hint-display" class="hint-box" style="display: none;"></div>
+          </div>
+        </div>
+
+        <div class="editor-panel">
+          <div class="editor-toolbar">
+            <div class="editor-label-left">editor.py</div>
+            <div class="editor-actions">
+              <button id="reset-code-btn" class="btn-tool">↺ Reset</button>
+              <button id="run-code-btn" class="btn-run">▶ Run</button>
+            </div>
+          </div>
+          <div id="code-editor"></div>
+          <div class="console-box">
+            <div class="console-top">
+              <span class="console-label">Output</span>
+              <button id="clear-console-btn" class="btn-clear-console">Clear</button>
+            </div>
+            <div id="console-output" class="console-output"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-footer two-col">
+        <button class="btn-cta" onclick="completeLesson()">
+          Complete Lesson
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button class="btn-ghost-sm" onclick="if(confirm('Skip the coding exercise? You can revisit anytime.')) completeLesson()">
+          Skip exercise
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Step 4: Complete ── -->
+    <div id="step-complete" class="lesson-step">
+      <div class="completion-screen">
+        <div class="completion-emoji" id="completion-emoji">🎓</div>
+        <h2 class="completion-title">Lesson Complete!</h2>
+        <p class="completion-sub">You nailed it. Here's your reward.</p>
+
+        <div class="xp-award-card">
+          <div class="xp-award-row">
+            <span class="xp-award-icon">⚡</span>
+            <span class="xp-award-number" id="xp-earned">+100</span>
+            <span class="xp-award-label">XP</span>
+          </div>
+          <div class="total-xp-track">
+            <div class="total-xp-fill" id="total-xp-fill" style="width: 0%"></div>
+          </div>
+          <p class="total-xp-text" id="total-xp-text">Total: 0 XP</p>
+        </div>
+
+        <div class="completion-actions">
+          <button class="btn-cta" onclick="nextLesson()">
+            Next Lesson
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button class="btn-ghost-sm" onclick="window.location.href='lessons.html'">
+            Back to map
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
   <script src="lesson-detail.js"></script>

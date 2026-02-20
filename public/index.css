@@ -1,0 +1,192 @@
+/* ============================
+   Dashboard — index.css
+   ============================ */
+
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+/* ============================
+   Stats row
+   ============================ */
+.dash-stats {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.stat-tile {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex: 1;
+  min-width: 140px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.stat-tile-icon {
+  font-size: 1.5rem;
+}
+
+.stat-tile-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.stat-tile-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 500;
+  margin-top: 0.15rem;
+}
+
+/* ============================
+   CTA card (next lesson)
+   ============================ */
+.cta-card {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  margin-bottom: 0.75rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.25);
+}
+
+.cta-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-emoji {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.cta-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.cta-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 0.2rem;
+}
+
+.cta-sub {
+  font-size: 0.85rem;
+  color: rgba(199, 210, 254, 0.85);
+  margin-bottom: 0.4rem;
+}
+
+.cta-meta {
+  font-size: 0.75rem;
+  color: rgba(165, 180, 252, 0.7);
+  font-weight: 600;
+}
+
+.cta-arrow {
+  font-size: 1.4rem;
+  color: rgba(165, 180, 252, 0.6);
+  flex-shrink: 0;
+}
+
+/* ============================
+   Secondary actions
+   ============================ */
+.secondary-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  text-decoration: none;
+  color: var(--text);
+  flex: 1;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  font-size: 0.875rem;
+}
+
+.action-tile:hover {
+  border-color: var(--border-light, #52525b);
+  background: var(--card);
+  transform: translateY(-1px);
+}
+
+.action-tile > span {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.action-tile-title {
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+}
+
+.action-tile-sub {
+  font-size: 0.775rem;
+  color: var(--subtext);
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 480px) {
+  .dash-stats { flex-direction: column; }
+  .cta-card-inner { gap: 0.75rem; }
+  .cta-emoji { font-size: 2rem; }
+  .cta-title { font-size: 1rem; }
+}
