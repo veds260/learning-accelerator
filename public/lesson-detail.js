@@ -512,32 +512,57 @@ async function completeLesson() {
 // Go to next lesson
 async function nextLesson() {
   try {
-    console.log('Finding next lesson...');
+    console.log('\n=== FINDING NEXT LESSON ===');
     
     // Load progress from localStorage
     const progress = loadLocalProgress();
     
-    console.log('Current progress:', progress);
-    console.log('Completed lessons:', progress.completedLessons);
+    console.log('📱 Current localStorage progress:', JSON.stringify(progress, null, 2));
+    console.log('✓ Completed lessons:', progress.completedLessons);
+    console.log('✓ Current lesson that was just completed:', lessonId);
     
     const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
     const lessons = await lessonsResponse.json();
     
-    const completedLessons = progress.completedLessons || [];
-    const nextLesson = lessons.find(l => !completedLessons.includes(l.id));
+    console.log('📚 Total lessons available:', lessons.length);
+    console.log('📋 All lesson IDs:', lessons.map(l => l.id).join(', '));
     
-    console.log('Next uncompleted lesson:', nextLesson ? nextLesson.id : 'none');
+    const completedLessons = progress.completedLessons || [];
+    console.log('🔍 Looking for first uncompleted lesson...');
+    
+    // Find first lesson that's NOT in completed list
+    const nextLesson = lessons.find(l => {
+      const isCompleted = completedLessons.includes(l.id);
+      console.log(`  ${l.id}: ${isCompleted ? '✅ completed' : '❌ not completed'}`);
+      return !isCompleted;
+    });
+    
+    console.log('\n🎯 Next lesson found:', nextLesson ? nextLesson.id : 'NONE');
     
     if (nextLesson) {
-      console.log('Navigating to:', nextLesson.id);
+      console.log(`🚀 Navigating to: ${nextLesson.id} (${nextLesson.title})`);
+      console.log('=== END FINDING NEXT LESSON ===\n');
       window.location.href = `lesson-detail.html?id=${nextLesson.id}`;
     } else {
+      console.log('🎉 All lessons complete!');
       alert('🎉 All lessons complete!');
       window.location.href = 'lessons.html';
     }
   } catch (error) {
-    console.error('Error finding next lesson:', error);
-    alert('Error loading next lesson. Returning to lessons list.');
-    window.location.href = 'lessons.html';
+    console.error('❌ Error finding next lesson:', error);
+    alert('Error loading next lesson. Check console for details.');
   }
 }
+ 
+ 
+
+// Show debug info on screen (for mobile)
+window.showDebugInfo = async function() {
+  const progress = loadLocalProgress();
+  const lessonsResponse = await fetch(API_BASE + '/api/lessons');
+  const lessons = await lessonsResponse.json();
+  
+  const debugDiv = document.getElementById('debug-progress');
+  debugDiv.innerHTML = `<strong>?? localStorage:</strong><br>Completed: ${JSON.stringify(progress.completedLessons)}<br>XP: ${progress.xp}<br><br><strong>Next:</strong> ${lessons.find(l => !progress.completedLessons.includes(l.id))?.id || 'NONE'}`;
+  debugDiv.style.display = 'block';
+};

@@ -159,9 +159,13 @@
         <p>You've earned <strong>+100 XP</strong></p>
         <div id="completion-badge"></div>
         
+        <!-- Debug info -->
+        <div id="debug-progress" style="margin: 1rem 0; padding: 1rem; background: #1a1a1a; border-radius: 8px; text-align: left; font-size: 12px; font-family: monospace;"></div>
+        
         <div class="completion-actions">
           <button class="btn primary" onclick="window.location.href='lessons.html'">Back to Lessons</button>
           <button class="btn secondary" onclick="nextLesson()">Next Lesson →</button>
+          <button class="btn secondary" onclick="showDebugInfo()" style="font-size: 11px;">Show Debug Info</button>
         </div>
       </div>
     </div>
