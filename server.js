@@ -238,6 +238,49 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// DEBUG ENDPOINT - Check current state
+app.get('/api/debug/state', async (req, res) => {
+  try {
+    const progress = readJSON(PROGRESS_FILE);
+    const lessons = loadAllLessons();
+    
+    res.json({
+      timestamp: new Date().toISOString(),
+      progress: {
+        completedLessons: progress.completedLessons || [],
+        completedCount: (progress.completedLessons || []).length,
+        xp: progress.xp || 0,
+        streak: progress.streak || 0,
+        lastActive: progress.lastActive
+      },
+      lessons: {
+        total: lessons.length,
+        available: lessons.map(l => ({
+          id: l.id,
+          level: l.level,
+          title: l.title
+        })),
+        nextLesson: lessons.find(l => !(progress.completedLessons || []).includes(l.id))
+      },
+      files: {
+        progressFile: PROGRESS_FILE,
+        progressExists: fs.existsSync(PROGRESS_FILE),
+        lessonFiles: [
+          { file: 'lesson-content.json', exists: fs.existsSync(LESSON_CONTENT_FILE) },
+          { file: 'lessons-6-10.json', exists: fs.existsSync(LESSONS_6_10_FILE) },
+          { file: 'lessons-11-15.json', exists: fs.existsSync(LESSONS_11_15_FILE) },
+          { file: 'lessons-16-20.json', exists: fs.existsSync(LESSONS_16_20_FILE) }
+        ]
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 // Dashboard
 app.get('/api/dashboard', async (req, res) => {
   try {
@@ -364,44 +407,80 @@ app.get('/api/lessons/:id', async (req, res) => {
 
 app.post('/api/lessons/:id/complete', async (req, res) => {
   try {
+    console.log('\n=== LESSON COMPLETION REQUEST ===');
+    console.log('Lesson ID:', req.params.id);
+    console.log('Timestamp:', new Date().toISOString());
+    
     const progress = readJSON(PROGRESS_FILE);
+    console.log('Current progress before completion:', {
+      completedLessons: progress.completedLessons || [],
+      xp: progress.xp || 0
+    });
+    
     const lessons = loadAllLessons();
     const lesson = lessons.find(l => l.id === req.params.id);
     
     if (!lesson) {
+      console.error('❌ Lesson not found:', req.params.id);
+      console.log('Available lessons:', lessons.map(l => l.id).join(', '));
       return res.status(404).json({ error: 'Lesson not found' });
     }
+    
+    console.log('✅ Found lesson:', lesson.title, `(Level ${lesson.level})`);
     
     if (!progress.completedLessons) {
       progress.completedLessons = [];
     }
     
     if (progress.completedLessons.includes(lesson.id)) {
+      console.log('⚠️  Lesson already completed');
       return res.json({ 
         message: 'Already completed',
         xp: progress.xp,
-        streak: progress.streak
+        streak: progress.streak,
+        completedLessons: progress.completedLessons.length
       });
     }
     
+    // Mark as complete
     progress.completedLessons.push(lesson.id);
-    progress.xp += 100;
+    progress.xp = (progress.xp || 0) + 100;
+    
+    console.log('📝 Updating progress:');
+    console.log('  - Added to completedLessons:', lesson.id);
+    console.log('  - New XP:', progress.xp);
+    console.log('  - Total completed:', progress.completedLessons.length);
     
     const newStreak = updateStreak();
     const milestones = checkMilestones(progress.xp);
     
     writeJSON(PROGRESS_FILE, progress);
+    console.log('💾 Progress saved to:', PROGRESS_FILE);
     
-    res.json({
+    // Verify it was saved
+    const verifyProgress = readJSON(PROGRESS_FILE);
+    console.log('✅ Verified saved progress:', {
+      completedLessons: verifyProgress.completedLessons,
+      xp: verifyProgress.xp
+    });
+    
+    const response = {
       xp: progress.xp,
       xpGained: 100,
       streak: newStreak,
       milestones,
       completedLessons: progress.completedLessons.length,
+      completedLessonIds: progress.completedLessons,
       message: `+100 XP! Total: ${progress.xp}`
-    });
+    };
+    
+    console.log('📤 Sending response:', response);
+    console.log('=== END COMPLETION ===\n');
+    
+    res.json(response);
   } catch (error) {
-    console.error('Error in /api/lessons/:id/complete:', error);
+    console.error('❌ ERROR in /api/lessons/:id/complete:', error);
+    console.error('Stack:', error.stack);
     res.status(500).json({ 
       error: 'Failed to complete lesson',
       details: IS_PRODUCTION ? undefined : error.message
@@ -597,7 +676,13 @@ app.get('/api/code-exercises/:lessonId', async (req, res) => {
 // Progress
 app.get('/api/progress', async (req, res) => {
   try {
+    // Force no-cache to prevent stale progress on mobile
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     const progress = readJSON(PROGRESS_FILE);
+    console.log('📊 Progress requested - completedLessons:', progress.completedLessons || []);
     const challenges = fs.existsSync(CHALLENGES_FILE) ? readJSON(CHALLENGES_FILE) : [];
     
     const tiers = {
