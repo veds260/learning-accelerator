@@ -10,6 +10,16 @@ let editor = null;
 let pyodide = null;
 let currentHintIndex = 0;
 
+// Logging helper
+function log(message, data = null) {
+  const timestamp = new Date().toISOString();
+  if (data) {
+    console.log(`[${timestamp}] ${message}`, data);
+  } else {
+    console.log(`[${timestamp}] ${message}`);
+  }
+}
+
 // Client-side progress storage
 const STORAGE_KEY = 'learning-accelerator-progress';
 
@@ -43,33 +53,80 @@ const lessonId = urlParams.get('id');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+  log('🚀 INITIALIZATION START');
+  log('Lesson ID from URL:', lessonId);
+  log('API Base:', API_BASE);
+  
   if (!lessonId) {
+    log('❌ No lesson ID found in URL');
     alert('No lesson specified');
     window.location.href = 'lessons.html';
     return;
   }
   
-  // Check if lesson is unlocked before loading
-  await checkLessonAccess();
-  
-  await loadLesson();
-  await loadQuiz();
-  await loadCodeExercise();
-  initPyodide();
+  try {
+    log('Step 1: Checking lesson access...');
+    await checkLessonAccess();
+    
+    log('Step 2: Loading lesson content...');
+    await loadLesson();
+    
+    log('Step 3: Loading quiz data...');
+    await loadQuiz();
+    
+    log('Step 4: Loading code exercises...');
+    await loadCodeExercise();
+    
+    log('Step 5: Initializing Python environment...');
+    initPyodide();
+    
+    log('✅ INITIALIZATION COMPLETE - Lesson should be visible now');
+    log('Current lesson data:', {
+      title: lessonData ? lessonData.title : 'NULL',
+      hasQuiz: !!quizData,
+      hasCodeExercises: codeExercises ? codeExercises.length > 0 : false
+    });
+  } catch (error) {
+    log('❌ INITIALIZATION FAILED');
+    log('Error message:', error.message);
+    log('Error stack:', error.stack);
+    console.error('Full error object:', error);
+    
+    // Update UI to show error
+    const titleEl = document.getElementById('lesson-title');
+    if (titleEl) {
+      titleEl.textContent = 'Error Loading Lesson';
+      titleEl.style.color = '#ef4444';
+    }
+    
+    alert('Failed to load lesson: ' + error.message + '\n\nCheck console for details.');
+  }
 });
 
 // Check if user has access to this lesson
 async function checkLessonAccess() {
   try {
+    log('📊 Loading user progress...');
     const progress = loadLocalProgress();
+    log('User progress loaded:', progress);
     
+    log('📚 Fetching lessons list from API...');
     const lessonsResponse = await fetch(`${API_BASE}/api/lessons`);
-    const lessons = await lessonsResponse.json();
+    log('API response status:', lessonsResponse.status);
+    
+    const lessonsData = await lessonsResponse.json();
+    log('API response received, type:', typeof lessonsData);
+    
+    // Handle both array and object responses
+    const lessons = Array.isArray(lessonsData) ? lessonsData : lessonsData.lessons;
+    log('Lessons count:', lessons ? lessons.length : 'NULL');
     
     const currentLessonIndex = lessons.findIndex(l => l.id === lessonId);
+    log('Current lesson index:', currentLessonIndex);
     
     if (currentLessonIndex === -1) {
-      console.error('Lesson not found:', lessonId);
+      log('❌ Lesson not found in lessons array:', lessonId);
+      log('Available lesson IDs:', lessons.map(l => l.id));
       alert('Lesson not found');
       window.location.href = 'lessons.html';
       return;
@@ -102,29 +159,63 @@ async function checkLessonAccess() {
 // Load lesson content
 async function loadLesson() {
   try {
-    console.log('Loading lesson:', lessonId);
+    log('📖 Fetching lesson content for:', lessonId);
     const response = await fetch(`${API_BASE}/api/lessons/${lessonId}`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    log('Lesson API response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      log('❌ API error response:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
     
     lessonData = await response.json();
-    console.log('Lesson loaded:', lessonData);
+    log('✅ Lesson data loaded successfully');
+    log('Lesson title:', lessonData.title);
+    log('Lesson has story:', !!lessonData.story);
+    log('Lesson has concept:', !!lessonData.concept);
+    log('Lesson has analogy:', !!lessonData.analogy);
+    log('Lesson has visual:', !!lessonData.visual);
     
+    log('🎨 Rendering lesson content...');
     renderLessonContent();
+    log('✅ Lesson content rendered');
   } catch (error) {
-    console.error('Failed to load lesson:', error);
+    log('❌ Failed to load lesson:', error.message);
+    console.error('Full error:', error);
     alert('Failed to load lesson: ' + error.message);
+    throw error;
   }
 }
 
 // Render lesson content in Step 1
 function renderLessonContent() {
-  document.getElementById('lesson-title').textContent = lessonData.title;
-  document.getElementById('lesson-subtitle').textContent = lessonData.subtitle || '';
+  log('🎨 Starting to render lesson content...');
   
-  document.getElementById('story-text').textContent = lessonData.story || '';
-  document.getElementById('concept-text').textContent = lessonData.concept || '';
-  document.getElementById('analogy-text').textContent = lessonData.analogy || '';
-  document.getElementById('visual-diagram').textContent = lessonData.visual || '';
+  const titleEl = document.getElementById('lesson-title');
+  const subtitleEl = document.getElementById('lesson-subtitle');
+  const storyEl = document.getElementById('story-text');
+  const conceptEl = document.getElementById('concept-text');
+  const analogyEl = document.getElementById('analogy-text');
+  const visualEl = document.getElementById('visual-diagram');
+  
+  log('DOM elements found:', {
+    title: !!titleEl,
+    subtitle: !!subtitleEl,
+    story: !!storyEl,
+    concept: !!conceptEl,
+    analogy: !!analogyEl,
+    visual: !!visualEl
+  });
+  
+  if (titleEl) titleEl.textContent = lessonData.title;
+  if (subtitleEl) subtitleEl.textContent = lessonData.subtitle || '';
+  if (storyEl) storyEl.textContent = lessonData.story || '';
+  if (conceptEl) conceptEl.textContent = lessonData.concept || '';
+  if (analogyEl) analogyEl.textContent = lessonData.analogy || '';
+  if (visualEl) visualEl.textContent = lessonData.visual || '';
+  
+  log('✅ Content populated into DOM elements');
   
   // Key points
   const keypointsList = document.getElementById('keypoints-list');
@@ -144,33 +235,45 @@ function renderLessonContent() {
 // Load quiz for this lesson
 async function loadQuiz() {
   try {
+    log('🎯 Fetching quiz for lesson:', lessonId);
     const response = await fetch(`${API_BASE}/api/quiz/${lessonId}`);
+    log('Quiz API response status:', response.status);
+    
     if (!response.ok) {
-      console.warn('No quiz found for this lesson');
+      log('⚠️ No quiz found for this lesson (OK - quiz optional)');
       return;
     }
     
     quizData = await response.json();
-    console.log('Quiz loaded:', quizData);
+    log('✅ Quiz data loaded:', quizData ? 'YES' : 'NO');
+    if (quizData) {
+      log('Quiz has in-lesson questions:', quizData.inLessonQuizzes ? quizData.inLessonQuizzes.length : 0);
+      log('Quiz has final quiz:', !!quizData.finalQuiz);
+    }
   } catch (error) {
-    console.error('Failed to load quiz:', error);
+    log('❌ Failed to load quiz:', error.message);
+    console.error('Full error:', error);
   }
 }
 
 // Load code exercises
 async function loadCodeExercise() {
   try {
+    log('💻 Fetching code exercises for lesson:', lessonId);
     const response = await fetch(`${API_BASE}/api/code-exercises/${lessonId}`);
+    log('Code exercise API response status:', response.status);
+    
     if (!response.ok) {
-      console.warn('No code exercise found for this lesson');
+      log('⚠️ No code exercise found for this lesson (OK - exercise optional)');
       return;
     }
     
     const data = await response.json();
     codeExercises = data.exercises || [];
-    console.log('Code exercises loaded:', codeExercises);
+    log('✅ Code exercises loaded, count:', codeExercises.length);
   } catch (error) {
-    console.error('Failed to load code exercises:', error);
+    log('❌ Failed to load code exercises:', error.message);
+    console.error('Full error:', error);
   }
 }
 
