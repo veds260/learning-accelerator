@@ -794,6 +794,81 @@ body {
 }
 
 .console-line.error { color: var(--danger); }
+.console-line.running { color: var(--muted); font-style: italic; }
+.console-line.success { color: var(--text); }
+
+/* ============================
+   Error Interpreter Card
+   ============================ */
+.error-card {
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 1.25rem;
+  animation: cardIn 0.3s ease both;
+}
+
+.error-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.error-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.error-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--danger);
+  letter-spacing: 0.01em;
+}
+
+.error-body {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  color: var(--subtext);
+}
+
+.error-body code {
+  background: rgba(239, 68, 68, 0.12);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.88em;
+  color: #fca5a5;
+}
+
+.error-details {
+  margin-top: 0.85rem;
+}
+
+.error-details summary {
+  font-size: 0.75rem;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.error-details summary:hover {
+  color: var(--subtext);
+}
+
+.error-raw {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
 
 /* ============================
    Step 4 — Completion
