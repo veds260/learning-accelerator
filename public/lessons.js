@@ -35,24 +35,40 @@ const BADGES = {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-  await loadLessonsData();
-  await loadUserProgress();
-  renderLessonsView();
-  setupEventListeners();
+  try {
+    console.log('🚀 Initializing lessons page...');
+    await loadLessonsData();
+    await loadUserProgress();
+    renderLessonsView();
+    setupEventListeners();
+    console.log('✅ Initialization complete');
+  } catch (error) {
+    console.error('❌ Initialization failed:', error);
+    document.getElementById('loading').style.display = 'none';
+    showError(`Failed to initialize: ${error.message}`);
+  }
 });
 
 // Load lesson content
 async function loadLessonsData() {
   try {
+    console.log('📚 Fetching lessons from /api/lessons...');
     const response = await fetch('/api/lessons');
+    console.log('📡 Response status:', response.status);
+    
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
+    
     lessonsData = await response.json();
-    console.log('Loaded lessons:', lessonsData.length);
+    console.log('✅ Loaded lessons:', lessonsData.length, 'lessons');
+    
+    if (lessonsData.length === 0) {
+      throw new Error('No lessons found in database');
+    }
   } catch (error) {
-    console.error('Failed to load lessons:', error);
-    showError(`Failed to load lessons: ${error.message}`);
+    console.error('❌ Failed to load lessons:', error);
+    throw error; // Re-throw to be caught by initialization
   }
 }
 
@@ -81,10 +97,13 @@ function calculateLevel(completedCount) {
 
 // Render lessons list view
 function renderLessonsView() {
+  console.log('🎨 Rendering lessons view...');
+  
   document.getElementById('loading').style.display = 'none';
   document.getElementById('lessons-list').style.display = 'block';
   
   const completedCount = userProgress.completedLessons.length;
+  console.log('📊 Progress:', completedCount, 'lessons completed');
   
   // Progressive disclosure: show stats only after first lesson
   if (completedCount > 0) {
@@ -442,12 +461,16 @@ function escapeHtml(text) {
 
 function showError(message) {
   const loading = document.getElementById('loading');
+  loading.style.display = 'block';
+  document.getElementById('lessons-list').style.display = 'none';
+  
   loading.innerHTML = `
-    <div style="text-align: center; color: #ef4444;">
-      <p style="font-size: 2rem; margin-bottom: 1rem;">⚠️</p>
-      <p>${message}</p>
-      <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer;">
-        Retry
+    <div style="text-align: center; color: #ef4444; padding: 2rem;">
+      <p style="font-size: 3rem; margin-bottom: 1rem;">⚠️</p>
+      <h2 style="margin-bottom: 1rem;">Oops!</h2>
+      <p style="margin-bottom: 2rem;">${message}</p>
+      <button onclick="location.reload()" style="padding: 0.75rem 1.5rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; cursor: pointer; font-size: 1rem;">
+        Try Again
       </button>
     </div>
   `;
