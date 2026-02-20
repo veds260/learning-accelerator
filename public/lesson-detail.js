@@ -86,6 +86,41 @@ document.addEventListener('DOMContentLoaded', async () => {
       hasQuiz: !!quizData,
       hasCodeExercises: codeExercises ? codeExercises.length > 0 : false
     });
+    
+    // CRITICAL: Hide loading state and show content
+    log('🎬 Showing content (hiding loading state)...');
+    const loadingEl = document.querySelector('.loading-state, #loading, .spinner');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+      log('✅ Loading state hidden');
+    } else {
+      log('⚠️ No loading element found to hide');
+    }
+    
+    // Make sure Step 1 (Learn) is visible
+    const stepLearn = document.getElementById('step-learn');
+    if (stepLearn) {
+      stepLearn.style.display = 'block';
+      stepLearn.style.visibility = 'visible';
+      stepLearn.style.opacity = '1';
+      stepLearn.classList.add('active');
+      log('✅ Step 1 (Learn) made visible');
+    } else {
+      log('❌ Step 1 element not found!');
+    }
+    
+    // Make sure container is visible
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.display = 'block';
+      container.style.visibility = 'visible';
+      log('✅ Container made visible');
+    }
+    
+    // Force scroll to top to ensure content is in view
+    window.scrollTo(0, 0);
+    log('✅ Scrolled to top');
+    
   } catch (error) {
     log('❌ INITIALIZATION FAILED');
     log('Error message:', error.message);
@@ -219,17 +254,37 @@ function renderLessonContent() {
   
   // Key points
   const keypointsList = document.getElementById('keypoints-list');
-  keypointsList.innerHTML = (lessonData.keyPoints || [])
-    .map(point => `<li>${point}</li>`)
-    .join('');
+  if (keypointsList) {
+    keypointsList.innerHTML = (lessonData.keyPoints || [])
+      .map(point => `<li>${point}</li>`)
+      .join('');
+    log('✅ Key points rendered:', lessonData.keyPoints ? lessonData.keyPoints.length : 0);
+  }
   
   // Real world applications
   const realworldList = document.getElementById('realworld-list');
-  realworldList.innerHTML = (lessonData.realWorld || [])
-    .map(item => `<li>${item}</li>`)
-    .join('');
+  if (realworldList) {
+    realworldList.innerHTML = (lessonData.realWorld || [])
+      .map(item => `<li>${item}</li>`)
+      .join('');
+    log('✅ Real-world applications rendered:', lessonData.realWorld ? lessonData.realWorld.length : 0);
+  }
   
-  document.getElementById('easteregg-text').textContent = lessonData.easterEgg || '';
+  const easterEggEl = document.getElementById('easteregg-text');
+  if (easterEggEl) {
+    easterEggEl.textContent = lessonData.easterEgg || '';
+    log('✅ Easter egg rendered');
+  }
+  
+  // Make sure all content sections are visible
+  const contentSections = document.querySelectorAll('.content-section');
+  log('Content sections found:', contentSections.length);
+  contentSections.forEach(section => {
+    section.style.display = 'block';
+    section.style.visibility = 'visible';
+    section.style.opacity = '1';
+  });
+  log('✅ All content sections made visible');
 }
 
 // Load quiz for this lesson
